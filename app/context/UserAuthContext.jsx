@@ -1,3 +1,5 @@
+//HEY
+
 import { useContext, createContext, useEffect, useState } from "react"
 import { useNavigation } from "@react-navigation/core";
 import { AuthErrorCodes, createUserWithEmailAndPassword, onAuthStateChanged,signInWithEmailAndPassword,sendEmailVerification  } from "firebase/auth";
