@@ -4,7 +4,6 @@
 //DESCRIPTION: This is where user can upload - video, thumbnail, short, details
 //<********************************************>
 
-
 //BASIC IMPORTS
 import { View,Text,Image,TouchableOpacity,TextInput,ScrollView,Pressable } from "react-native"
 import React, { useEffect,useState } from 'react';

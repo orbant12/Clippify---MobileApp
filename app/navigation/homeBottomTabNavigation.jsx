@@ -1,6 +1,15 @@
+//<********************************************>
+//LAST EDITED: 2023.12.04
+//EDITED BY: Orban Tamas
+//DESC: This is the bottom tab navigation for the home page. It contains the following tabs: Home, Search, Upload, Inbox, Profile
+//<********************************************>
+
+//BASIC IMPORTS
 import React,{useState} from 'react';
 import {Image, Text,View,TouchableOpacity} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+
+//COMPONENTS
 import TabOneScreen from '../pages/home';
 import ForYouPage from '../pages/forYou';
 import TabTwoScreen from '../pages/category';
@@ -8,24 +17,23 @@ import UploadPage from '../pages/upload';
 import Inbox from '../pages/inbox';
 import Profile from '../pages/profile';
 
+//ICONS
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LupodyLogo from "../../assets/images/LupodyPNG.png"
-
-
 import plusIcon from '../../assets/favicon.png';
 import { Icon } from 'react-native-elements';
 
+//NAVIGATION TAB CREATION
 const Tab = createBottomTabNavigator();
+
 
 const HomeBottomTabNavigator = () => {
 
+//<**********************VARIABLES******************************>
 const [isExplore,setIsExplore] = useState(true);
-
-
-
 
 return (
   <Tab.Navigator
@@ -55,7 +63,6 @@ return (
               <TouchableOpacity onPress={() => setIsExplore(true)} style={isExplore? {borderBottomColor:"black",borderBottomWidth:2} : {}}>
                 <Text style={isExplore?{fontWeight:"800"}:{opacity:0.4,fontWeight:800,color:"black"}}>Explore</Text>
               </TouchableOpacity>
-         
               <TouchableOpacity onPress={() => setIsExplore(false)} style={!isExplore? {borderBottomColor:"black",borderBottomWidth:2} : {}}>
                 <Text style={isExplore?{opacity:0.4,fontWeight:800,color:"black"}:{fontWeight:"800"}}>For You</Text>
               </TouchableOpacity>

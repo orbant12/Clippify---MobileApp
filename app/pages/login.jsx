@@ -4,7 +4,6 @@
 //DESCRIPTION: This is the login page, where the user can login to the app
 //<********************************************>
 
-
 //BASIC IMPORTS
 import React,{useState} from 'react';
 import { View, Text,SafeAreaView,StyleSheet,TextInput,Button  } from 'react-native';

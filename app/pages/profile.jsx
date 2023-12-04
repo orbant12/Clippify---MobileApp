@@ -4,7 +4,6 @@
 //DESCRIPTION: This is the data navigator where current user can see his/her profile and data
 //<********************************************>
 
-
 //BASIC IMPORTS
 import { View,Text,StyleSheet,Image,TouchableOpacity } from "react-native"
 import React, { useEffect, useState } from 'react';

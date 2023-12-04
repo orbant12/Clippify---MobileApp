@@ -1,6 +1,8 @@
+//<********************************************>
 //LAST EDITED DATE: 2023.12.03
 //EDITED BY: Orban Tamas
 //DESCRIPTION: This is the category page, where the user can choose from the categories
+//<********************************************>
 
 //COMPONENTS
 import React from 'react';

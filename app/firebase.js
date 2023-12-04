@@ -1,7 +1,12 @@
+//<********************************************>
+//LAST EDITED: 2023.12.04
+//EDITED BY: ORBAN TAMAS
+//DESCRIPTION: This file contains the firebase configuration.
+//<********************************************>
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth,initializeAuth,getReactNativePersistence } from 'firebase/auth';
+import { initializeAuth,getReactNativePersistence } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
    // TODO: Add SDKs for Firebase products that you want to use
    // https://firebase.google.com/docs/web/setup#available-libraries

@@ -1,6 +1,8 @@
+//<********************************************>
 //LAST EDITED DATE: 2023.12.03
 //EDITED BY: Orban Tamas
 //DESCRIPTION: This is the for you page, where the user can see the short podcast intro videos from the database
+//<********************************************>
 
 //BASICS
 import React, {useEffect, useState} from 'react';
