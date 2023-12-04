@@ -15,6 +15,7 @@ export default function App() {
       
         <NavigationContainer>
           <UserAuthContext>
+        
             <Stack.Navigator initialRouteName="LoginPage">
                 <Stack.Screen name="Login" component={LoginPage} options={{ headerShown:false}} />
                 <Stack.Screen name="Home" component={HomeBottomTabNavigator} options={{ headerShown:false}} />
@@ -25,6 +26,7 @@ export default function App() {
     
             </ Stack.Navigator>
       
+  
 
             </UserAuthContext>
         </NavigationContainer>
