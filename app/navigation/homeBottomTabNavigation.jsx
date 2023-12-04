@@ -27,7 +27,6 @@ const [isExplore,setIsExplore] = useState(true);
 
 
 
->>>>>>> 61859ae (Update file permissions and add new files)
 return (
   <Tab.Navigator
     tabBarOptions={{
