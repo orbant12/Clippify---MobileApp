@@ -25,6 +25,11 @@ const HomeBottomTabNavigator = () => {
 const [isExplore,setIsExplore] = useState(true);
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 61859ae (Update file permissions and add new files)
 return (
   <Tab.Navigator
     tabBarOptions={{
