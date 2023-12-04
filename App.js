@@ -2,7 +2,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginPage from "./app/pages/login";
 import UserAuthContext from "./app/context/UserAuthContext";
-import TabOneScreen from "./app/pages/home";
 import HomeBottomTabNavigator from "./app/navigation/homeBottomTabNavigation";
 import VideoPage from "./app/pages/Screens/videoDisplay";
 import FilePage from "./app/pages/Screens/filePage";
