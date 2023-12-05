@@ -73,9 +73,7 @@ useEffect(() => {
     }
     else {
       
-      /*if(window.location.pathname != "/login" && window.location.pathname != "/register" && window.location.pathname != "/support/contact-us" && window.location.pathname != "/support/feedback" && window.location.pathname != "/policies/legal" && window.location.pathname != "/policies/legal/terms" && window.location.pathname != "/policies/legal/cookie-policy" && window.location.pathname != "/policies/legal/privacy-policy" && window.location.pathname != "/policies/legal/acceptable-use-policy" && window.location.pathname != "/policies/security" && window.location.pathname != "/landing" && window.location.pathname != "/policies"){
-          window.location.href = "/landing"
-        }*/
+      navigation.navigate("Login")
             
     }
   })

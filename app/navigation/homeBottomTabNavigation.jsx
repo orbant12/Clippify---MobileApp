@@ -17,6 +17,7 @@ import UploadPage from '../pages/upload';
 import Inbox from '../pages/inbox';
 import Profile from '../pages/profile';
 
+
 //ICONS
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -30,7 +31,14 @@ import { Icon } from 'react-native-elements';
 const Tab = createBottomTabNavigator();
 
 
-const HomeBottomTabNavigator = () => {
+const HomeBottomTabNavigator = ({navigation}) => {
+
+//<**********************FUNCTIONS******************************>
+
+//SETTINGS NAVIGATION
+const handleSettingsNavigation = () => {
+  navigation.navigate("SettingsPage")
+}
 
 //<**********************VARIABLES******************************>
 const [isExplore,setIsExplore] = useState(true);
@@ -160,9 +168,8 @@ return (
           headerTransparent:false,
           header: () => (
             <View style={{width:"100%",backgroundColor:"white",paddingTop:40,paddingBottom:10}} >
-              <View style={{flexDirection:"row-reverse",justifyContent:"space-between",marginRight:30,marginLeft:30,alignItems:"center",width:"50%"}}>
-                <Text >Admin 1</Text>  
-                  <TouchableOpacity onPress={() => na}>
+              <View style={{alignItems:"flex-end",width:"100%"}}>           
+                  <TouchableOpacity style={{marginRight:30}} onPress={handleSettingsNavigation}>
                     <Icon
                       name='menu'
                       type='material'
