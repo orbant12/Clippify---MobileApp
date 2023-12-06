@@ -1,3 +1,7 @@
+//<********************************************>
+//NOT IN USE
+//LABELED AT 2023-12-06
+//<********************************************>
 
 import React from 'react';
 import {View,Text,Image,TouchableOpacity,StyleSheet} from 'react-native';

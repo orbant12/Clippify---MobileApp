@@ -1,4 +1,10 @@
+//<********************************************>
+//LAST EDITED DATE: 2023.12.06
+//EDITED BY: Orban Tamas
+//DESCRIPTION: This is the video frame components for the Home Page Horizontal Scroll
+//<********************************************>
 
+//BASIC IMPORTS
 import React from 'react';
 
 //Components
@@ -17,7 +23,6 @@ const handleNavigation = () => {
         {data: props,navigation:navigation}
     );
 }
-
 
 return (
 <View style={{width:"100%",marginVertical: 10,marginBottom:40}}>

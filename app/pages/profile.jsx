@@ -24,6 +24,7 @@ import { useAuth } from "../context/UserAuthContext";
 //FIREBASE
 import { doc,getDoc } from "firebase/firestore";
 import { db } from '../firebase';
+import AchivementPage from "./Screens/profile/userAchivementPage";
 
 
 const Profile = ({navigation,handleSettings}) => {
@@ -128,17 +129,6 @@ return (
             </Tabs.ScrollView>
         </Tabs.Tab>
 
-        {/* COMMUNITY PAGE */}
-        <Tabs.Tab 
-            name="B"
-            label={() => <Entypo name={'video'} size={25} color={"black"} />}
-            activeColor={"red"}
-        >
-            <Tabs.ScrollView>
-                <UserVideoPage />
-            </Tabs.ScrollView>
-        </Tabs.Tab>
-
         {/* CLIPS PAGE */}
         <Tabs.Tab 
             name="C"
@@ -154,10 +144,23 @@ return (
             name="D"
             label={() => <Entypo name={'save'} size={25} color={"black"} />}
         >
+        
             <Tabs.ScrollView>
                 <UserSavedPage />
             </Tabs.ScrollView>
         </Tabs.Tab>
+
+        {/* COMMUNITY PAGE */}
+        <Tabs.Tab 
+            name="B"
+            label={() => <Entypo name={'trophy'} size={25} color={"black"} />}
+            activeColor={"red"}
+        >
+            <Tabs.ScrollView>
+                <AchivementPage />
+            </Tabs.ScrollView>
+        </Tabs.Tab>
+
     </Tabs.Container>     
 </View>   
 )}

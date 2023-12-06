@@ -227,28 +227,24 @@ const handleUploadVideo = async () => {
 //ON CURRENT USER LOAD
 useEffect(() => {
   const fetchUserData = async () => {
-    try {
-      if (currentuser) {
-        const currentUserId = currentuser.uid;
-        const userDocRef = doc(db, "users", currentUserId);
-        
-  
-        const docSnapshot = await getDoc(userDocRef);
-  
-        if (docSnapshot.exists()) {
-          // Document exists, retrieve its data
-          const elementData = docSnapshot.data();
-          setUserData(elementData);
-          
-        } else {
-          console.log("Document does not exist.");
-          setUserData(null); // Set to null or handle accordingly
-        }
+  try {
+    if (currentuser) {
+      const currentUserId = currentuser.uid;
+      const userDocRef = doc(db, "users", currentUserId);
+      const docSnapshot = await getDoc(userDocRef);
+      if (docSnapshot.exists()) {
+        // Document exists, retrieve its data
+        const elementData = docSnapshot.data();
+        setUserData(elementData);
+      } else {
+        console.log("Document does not exist.");
+        setUserData(null); // Set to null or handle accordingly
       }
-    } catch (error) {
-      console.error("Error getting document: ", error);
     }
-  };
+  } catch (error) {
+    console.error("Error getting document: ", error);
+  }
+};
 
   //1.) Fetch the user data
   fetchUserData();

@@ -72,9 +72,7 @@ useEffect(() => {
       navigation.navigate("Home")
     }
     else {
-      
-      navigation.navigate("Login")
-            
+      navigation.navigate("Login")  
     }
   })
   const fetchData = async () => {

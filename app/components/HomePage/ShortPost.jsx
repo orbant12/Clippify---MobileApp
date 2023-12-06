@@ -1,32 +1,53 @@
+//<********************************************>
+//LAST EDITED DATE: 2023.12.06
+//EDITED BY: Orban Tamas
+//DESCRIPTION: This is the short post component for the FYP page
+//<********************************************>
 
+//BASIC IMPORTS
 import React, { useState} from 'react';
 import {View, TouchableWithoutFeedback, Text, Image, TouchableOpacity} from 'react-native';
+
+//COMPONENTS
 import { Video } from 'expo-av';
+
+//STYLES
 import styles from './styles';
 
+//ICONS
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+
+//CONTEXT
 import {useAuth} from '../../context/UserAuthContext';
+
 const ShortPost = ({post}) => {
 
+//<***********************VARIABLES**********************>
+
+//IS POST LIKED | LIKES
 const [isLiked, setIsLiked] = useState(false);
+
+//PAUSE VIDEO
 const [paused, setPaused] = useState(true);
 
+//AUTH CONTEXT
 const {currentuser} = useAuth();
+
+//VIDEO REF
 const video = React.useRef(null);
 
+//<***********************FUNCTIONS**********************>
+
+//PAUSE VIDEO ON TAP
 const onPlayPausePress = () => {
-    setPaused(!paused);
-  };
-
-
-
-
+  setPaused(!paused);
+};
 
 return (
-    <View style={styles.container}>
+  <View style={styles.container}>
     <TouchableWithoutFeedback onPress={onPlayPausePress}>
       <View>
         <Video
@@ -89,8 +110,5 @@ return (
   </View>
 );
 };
-
-
-
 
 export default ShortPost;

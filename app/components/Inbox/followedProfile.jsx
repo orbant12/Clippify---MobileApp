@@ -1,4 +1,10 @@
+//<********************************************>
+//LAST EDITED DATE: 2023.12.06
+//EDITED BY: Orban Tamas
+//DESCRIPTION: This is a component for the inbox page, Horizontal scrollable list of followed profiles AVATAR + FULLNAME
+//<********************************************>
 
+//BASIC IMPORTS
 import { View,Text,Image, Pressable } from "react-native";
 
 
@@ -6,8 +12,8 @@ const InboxFollowedProfile = ({navigation,props}) => {
 
 return(
 <Pressable onPress={() => navigation.navigate('Video',
-        {data: props.id,navigation:navigation}
-    )}>
+    {data: props.id,navigation:navigation}
+)}>
     <View style={{alignItems:"center",height:60,flexDirection:"column",marginLeft:30,height:80}}>
         <Image 
             source={{uri: props.avatar}}
@@ -20,7 +26,6 @@ return(
         <Text style={{marginTop:5,fontWeight:"500",fontSize:11}}>{props.fullname}</Text>
     </View>
 </Pressable>
-)
-}
+)}
 
 export default InboxFollowedProfile;
