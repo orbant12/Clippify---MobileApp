@@ -1,14 +1,28 @@
+//<****************************************************>
+//LAST EDITED: 2023.12.06
+//EDITED BY: ORBAN TAMAS
+//DESC : This is the page where the user can edit his/her episodes
+//<****************************************************>
 
+
+//BASE IMPORTS
 import React,{useState,useEffect,useRef} from 'react';
-import {View,Text,StyleSheet,TouchableOpacity,ScrollView,FlatList,Image} from 'react-native';
+import {View,Text,StyleSheet,TouchableOpacity,ScrollView,FlatList,Image,TextInput,Pressable,Alert} from 'react-native';
+
+//CONTEXT
 import { useAuth } from '../../../../context/UserAuthContext';
-import { Icon } from 'react-native-elements';
 import {BottomSheetModal,BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import "react-native-gesture-handler"
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+//COMPONENTS
 import VideoContainer from '../../../../components/CreatorPage/VideoContainer';
 import { Video } from 'expo-av';
 import * as ImagePicker from 'expo-image-picker';
+
+//ICONS
+import { Icon } from 'react-native-elements';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 //FIREBASE
 import { collection, getDocs,where,query,deleteDoc,doc,updateDoc } from "firebase/firestore";
@@ -26,16 +40,23 @@ const {currentuser} = useAuth();
 const bottomSheetRef = useRef(null);
 const snapPoints = ['80%'];
 
+//CATEGORY BOTTOM SHEET
+const categoryBottomSheetRef = useRef(null);
+const categorySnapPoints = ['80%'];
+
 //EPISODE SELECTED
 const [episodeSelected,setEpisodeSelected] = useState(null);
 
 //USER EPISODES
 const [userEpisodes,setUserEpisodes] = useState([]);
+const [episodeTitle,setEpisodeTitle] = useState("");
+const [episodeDescription,setEpisodeDescription] = useState("");
 
 //EDIT STATES
 const [isThubnailEdit,setIsThubnailEdit] = useState(false);
 const [isShortIntroEdit,setIsShortIntroEdit] = useState(false);
 const [isTitleEdit,setIsTitleEdit] = useState(false);
+const [isDescriptionEdit,setIsDescriptionEdit] = useState(false);
 
 //NEW THUBNAIL
 const [newThubnail,setNewThubnail] = useState(null);
@@ -45,6 +66,12 @@ const [newShortIntro,setNewShortIntro] = useState(null);
 
 //NEW TITLE
 const [newTitle,setNewTitle] = useState(null);
+
+//SELECTED CATEGORY
+const [selectedCategory,setSelectedCategory] = useState(null);
+
+//NEW DESCRIPTION
+const [newDescription,setNewDescription] = useState(null);
 
 //<**********************FUNCTIONS******************************>
 
@@ -57,6 +84,10 @@ const handleBottomSheet = () => {
 //SELECTED EPISODE
 const handleSelectedEpisode = (item) => {
     setEpisodeSelected(item);
+    setEpisodeTitle(item.title);
+    setSelectedCategory(item.video_category);
+    setEpisodeDescription(item.description);
+    setNewDescription(item.description);
     bottomSheetRef.current.close();
 }
 
@@ -103,6 +134,27 @@ const deleteFilesInStorage = async () => {
         await deleteObject(item);
     }));
 };
+
+//DELETE VIDEO MODAL ALERT
+const deleteVideoAlert = () => {
+    Alert.alert(
+        "Delete Video",
+        "Are you sure you want to delete this video ?",
+        [
+            {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+            },
+            { 
+                text: "Delete", 
+                onPress: () => handleVideoDelete() 
+            }
+        ]
+    );
+
+}
+
 //DELETE VIDEO
 const handleVideoDelete = async() => {
     //1.) Delete video from user videos
@@ -198,18 +250,54 @@ const handleShortIntroSave = async() => {
     handleSelectedEpisode(episodeSelected);
 }
 
-//EDIT TITLE
-const handleTitleEdit = () => {
-    console.log("Edit Title")
+//EDIT TITLE | Input Handler
+const handleTitleEdit = (e) => {
+    setNewTitle(e);
+}
+//EDIT TITLE | Toggle
+const handleTitleEditToggle = () => {
+
+    setIsTitleEdit(!isTitleEdit);
 }
 //SAVE TITLE
 const handleTitleSave = async() => {
-
+    //UPDATE DOCS
+    const videoRef = doc(db, "users", currentuser.uid, "Videos", episodeSelected.id);
+    const publickVideoRef = doc(db, "videos", episodeSelected.id);
+    //UPDATE DOCS
+    updateDoc(videoRef, {
+        title: newTitle,
+    });
+    updateDoc(publickVideoRef, {
+        title: newTitle,
+    });
+    //UPDATE STORAGE
+    alert("Title Updated")
+    setIsTitleEdit(false);
+    setEpisodeTitle(newTitle);
+    setNewTitle("");
 }
 
 //EDIT CATEGORY
 const handleCategoryEdit = () => {
-    console.log("Edit Category")
+    categoryBottomSheetRef.current?.present();
+}
+
+//BOTTOM SHEET CATEGORY SELECTED | CLOSER 
+const handlePickedCategory = (category) => {
+    //VIDEO UPDATE DOCS
+    const videoRef = doc(db, "users", currentuser.uid, "Videos", episodeSelected.id);
+    const publickVideoRef = doc(db, "videos", episodeSelected.id);
+    //UPDATE DOCS
+    updateDoc(videoRef, {
+        video_category: category,
+    });
+    updateDoc(publickVideoRef, {
+        video_category: category,
+    });
+    alert("Category Updated")
+    setSelectedCategory(category);
+    categoryBottomSheetRef.current?.close();
 }
 
 //EDIT CAST
@@ -217,9 +305,30 @@ const handleCastEdit = () => {
     console.log("Edit Cast")
 }
 
-//EDIT DESCRIPTION
-const handleDescriptionEdit = () => {
-    console.log("Edit Description")
+//EDIT DESCRIPTION | Input Handler
+const handleDescriptionEdit = (e) => {
+    setNewDescription(e);
+}
+//EDIT DESCRIPTION | Toggle
+const handleDescriptionEditToggle = () => {
+    setIsDescriptionEdit(!isDescriptionEdit);
+}
+//SAVE DESCRIPTION
+const handleDescriptionSave = async() => {
+    //UPDATE DOCS
+    const videoRef = doc(db, "users", currentuser.uid, "Videos", episodeSelected.id);
+    const publickVideoRef = doc(db, "videos", episodeSelected.id);
+    //UPDATE DOCS
+    updateDoc(videoRef, {
+        description: newDescription,
+    });
+    updateDoc(publickVideoRef, {
+        description: newDescription,
+    });
+    //UPDATE STORAGE
+    alert("Description Updated")
+    setIsDescriptionEdit(false);
+    setEpisodeDescription(newDescription);
 }
 
 useEffect(() => {
@@ -237,7 +346,7 @@ return (
                 </TouchableOpacity>
                 
                 {episodeSelected != null ? (
-                <TouchableOpacity style={styles.deleteSelect}>
+                <TouchableOpacity onPress={deleteVideoAlert} style={styles.deleteSelect}>
                     <Icon
                         name='delete'
                         type='material'
@@ -270,7 +379,7 @@ return (
                         isLooping
                         style={{ width: "80%", aspectRatio: 16 / 9,borderRadius:20,borderWidth:3,marginLeft:"auto",marginRight:"auto" }}
                     />
-                    <TouchableOpacity onPress={handleVideoDelete} style={styles.buttonEdit}>
+                    <TouchableOpacity onPress={deleteVideoAlert} style={styles.buttonEdit}>
                         <Icon
                             name='delete'
                             type='material'
@@ -393,24 +502,58 @@ return (
                 <ScrollView horizontal>
                     <View style={[styles.itemContainer,{marginLeft:30}]}>
                         <Text style={styles.title}>Title</Text>
-                        <Text style={{ width: "100%",padding:20,borderRadius:20,borderWidth:3,marginLeft:"auto",marginRight:"auto" }}>
-                            {episodeSelected.title}
-                        </Text>
-                        <TouchableOpacity onPress={handleTitleEdit} style={styles.buttonEditBottom}>
-                            <Icon
-                                name='edit'
-                                type='material'
-                                color='blue'
-                                size={25}
-                                style={{opacity:0.5}}
+                        {!isTitleEdit ? (
+                        <>
+                            <Text 
+                                style={{ width: "100%",padding:20,borderRadius:20,borderWidth:3,marginLeft:"auto",marginRight:"auto" }}
+                            >
+                                {episodeTitle}
+                            </Text>
+                            <TouchableOpacity onPress={handleTitleEditToggle} style={styles.buttonEditBottom}>
+                                <Icon
+                                    name='edit'
+                                    type='material'
+                                    color='blue'
+                                    size={25}
+                                    style={{opacity:0.5}}
+                                />
+                            </TouchableOpacity>
+                        </>
+                        ):(
+                        <>
+                            <TextInput 
+                                value={newTitle} 
+                                style={{padding:20,width:"100%",borderRadius:20,borderWidth:2,marginRight:"auto",marginLeft:"auto"}}
+                                onChangeText={handleTitleEdit} placeholder={episodeSelected.title} 
                             />
-                        </TouchableOpacity>
+                            <View style={{flexDirection:"row"}}>
+                                <TouchableOpacity onPress={handleTitleEditToggle} style={styles.buttonEditBottom}>
+                                    <Icon
+                                        name='undo'
+                                        type='material'
+                                        color='red'
+                                        size={25}
+                                        style={{opacity:0.5}}
+                                    />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleTitleSave} style={[styles.buttonEditBottom,{marginLeft:20}]}>
+                                    <Icon
+                                        name='file-upload'
+                                        type='material'
+                                        color='green'
+                                        size={25}
+                                        style={{opacity:0.5}}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                        )}
+                        
                     </View>
-
                     <View style={[styles.itemContainer,{marginLeft:30}]}>
                         <Text style={styles.title}>Category</Text>
                         <Text style={{ width: "100%",padding:20,borderRadius:20,borderWidth:3,marginLeft:"auto",marginRight:"auto" }}>
-                            {episodeSelected.video_category}
+                            {selectedCategory}
                         </Text>
                         <TouchableOpacity onPress={handleCategoryEdit} style={styles.buttonEditBottom}>
                             <Icon
@@ -422,7 +565,6 @@ return (
                             />
                         </TouchableOpacity>
                     </View>
-
                     <View style={[styles.itemContainer,{marginLeft:30}]}>
                         <Text style={styles.title}>Cast</Text>
                         <Text style={{ width: "100%",padding:20,borderRadius:20,borderWidth:3,marginLeft:"auto",marginRight:"auto" }}>
@@ -442,18 +584,51 @@ return (
                 {/* DESCRIPTION EDIT */}
                 <View style={styles.itemContainer}>
                     <Text style={styles.title}>Description</Text>
-                    <Text style={{ width: "90%",padding:10,borderRadius:20,borderWidth:3,marginLeft:"auto",marginRight:"auto" }} >
-                        {episodeSelected.description}
-                    </Text>
-                    <TouchableOpacity onPress={handleDescriptionEdit} style={styles.buttonEdit}>
-                        <Icon
-                            name='edit'
-                            type='material'
-                            color='blue'
-                            size={25}
-                            style={{opacity:0.5}}
+                    {!isDescriptionEdit ? (
+                    <>
+                        <Text style={{ width: "90%",padding:10,borderRadius:20,borderWidth:3,marginLeft:"auto",marginRight:"auto" }} >
+                            {episodeDescription}
+                        </Text>
+                        <TouchableOpacity onPress={handleDescriptionEditToggle} style={styles.buttonEdit}>
+                            <Icon
+                                name='edit'
+                                type='material'
+                                color='blue'
+                                size={25}
+                                style={{opacity:0.5}}
+                            />
+                        </TouchableOpacity>
+                    </>
+                    ):(
+                    <>
+                        <TextInput 
+                            multiline 
+                            onChangeText={handleDescriptionEdit} 
+                            style={{ width: "90%",padding:13,borderRadius:20,borderWidth:3,marginLeft:"auto",marginRight:"auto" }} 
+                            value={newDescription} 
                         />
-                    </TouchableOpacity>
+                        <View style={{flexDirection:"row"}}>
+                            <TouchableOpacity onPress={handleDescriptionEditToggle} style={styles.buttonEditBottom}>
+                                <Icon
+                                    name='undo'
+                                    type='material'
+                                    color='red'
+                                    size={25}
+                                    style={{opacity:0.5}}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleDescriptionSave} style={[styles.buttonEditBottom,{marginLeft:20}]}>
+                                <Icon
+                                    name='file-upload'
+                                    type='material'
+                                    color='green'
+                                    size={25}
+                                    style={{opacity:0.5}}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </>
+                    )}
                 </View>
             </ScrollView>
             ):null}
@@ -489,6 +664,99 @@ return (
                     />
                 </View>
             </View>
+        </BottomSheetModal>
+        
+        {/* CATEGORY SHEET */}
+        <BottomSheetModal
+            ref={categoryBottomSheetRef}
+            snapPoints={categorySnapPoints}
+            enablePanDownToClose={true}
+            handleIndicatorStyle={{backgroundColor:"white"}}
+            containerStyle={{width:"80%",marginRight:"auto",marginLeft:40}}
+            backgroundStyle={{backgroundColor:"black",borderTopLeftRadius:30,borderTopRightRadius:30}}
+        >
+            <ScrollView style={{width:"100%",backgroundColor:"white",borderWidth:2,borderColor:"black"}}>
+                <Pressable onPress={() => handlePickedCategory("Health")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between",borderTopWidth:2}}>
+                    <Text>Health</Text>
+                    <MaterialCommunityIcons
+                        name="medical-bag"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+
+                <Pressable onPress={() => handlePickedCategory("Fitness")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                    <Text>Fitness</Text>
+                    <MaterialCommunityIcons
+                        name="dumbbell"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+
+                <Pressable onPress={() => handlePickedCategory("Business")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                    <Text>Business</Text>
+                    <MaterialCommunityIcons
+                        name="handshake"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+
+                <Pressable onPress={() => handlePickedCategory("Finance")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                    <Text>Finance</Text>
+                    <MaterialCommunityIcons
+                        name="cash"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+
+                <Pressable onPress={() => handlePickedCategory("Science")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                    <Text>Science</Text>
+                    <MaterialCommunityIcons
+                        name="atom"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+
+                <Pressable onPress={() => handlePickedCategory("Comedy")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                    <Text>Comedy</Text>
+                    <MaterialCommunityIcons
+                        name="drama-masks"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+
+                <Pressable onPress={() => handlePickedCategory("Music")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                    <Text>Music</Text>
+                    <MaterialCommunityIcons
+                        name="music-note"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+
+                <Pressable onPress={() => handlePickedCategory("History")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                    <Text>History</Text>
+                    <MaterialCommunityIcons
+                        name="bookshelf"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+
+                <Pressable onPress={() => handlePickedCategory("Politics")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between",borderBottomWidth:2}}>
+                    <Text>Politics</Text>
+                    <MaterialCommunityIcons
+                        name="account-voice"
+                        size={20}
+                        color="black"
+                    />
+                </Pressable>
+            </ScrollView>
         </BottomSheetModal>
     </BottomSheetModalProvider>
 </GestureHandlerRootView>
