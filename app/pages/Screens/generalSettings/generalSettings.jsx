@@ -1,4 +1,10 @@
+//<***********************************>
+//LAST EDITED: 2023.12.06
+//EDITED BY: Orban Tamas
+//DESC: This page is the general settings page, it shows the settings based on the selected category
+//<***********************************>
 
+//BASIC IMPORTS
 import React from 'react'
 import {View,Text,TouchableOpacity,StyleSheet} from 'react-native'
 

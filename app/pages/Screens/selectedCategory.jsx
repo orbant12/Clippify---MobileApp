@@ -1,16 +1,30 @@
+//<***********************************>
+//LAST EDITED: 2023.12.06
+//EDITED BY: Orban Tamas
+//DESC: This page is the selected category page, it shows the videos from the selected category
+//<***********************************>
 
+//BASIC IMPORTS
 import React, { useEffect,useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View,Text,ImageBackground,Pressable,FlatList } from 'react-native';
+import { ScrollView, StyleSheet,View,Text,FlatList } from 'react-native';
+
+//COMPONENTS
 import VideoFrameScroll from '../../components/HomePage/videoFrameScroll';
-import { collection,query,orderBy,limit,getDocs, startAfter, where } from "firebase/firestore";
-import { db } from '../../firebase';
 import VideoFrame from '../../components/HomePage/videoFrame';
+
+//FIREBASE IMPORTS
+import { collection,query,orderBy,limit,getDocs,where } from "firebase/firestore";
+import { db } from '../../firebase';
+
 const SelectedCategoryPage = ({route,navigation}) => {
 
+//GET THE SELECTED CATEGORY
 const category = route.params.category;
 
+//CATEGORY BASED VIDEOS
 const [posts, setPosts] = useState([]);
 
+//FETCH VIDEOS FROM THE SELECTED CATEGORY
 const fetchVideosByCategory = async () => {
     const videoRef = collection(db, "videos");
     const q = query(videoRef, where("video_category", "==", category), orderBy("video_category"), limit(3));
@@ -23,44 +37,43 @@ const fetchVideosByCategory = async () => {
         });
     });
     setPosts(tempPosts);
-
 };
 
+//ON PAGE LOAD
 useEffect(() => {
-    fetchVideosByCategory();
+  //1.) fetch videos from the selected category
+  fetchVideosByCategory();
 }, []);
 
 return(
 <View style={styles.container}>
-        <FlatList 
-        style={{width:"100%",paddingTop:50,height:"auto"}}
-        keyExtractor={(item) => item.id} 
-        data={posts}
-        ItemSeparatorComponent={() =>   
-        <View style={styles.container}>
-            <View style={styles.header} >
-            <Text style={styles.title}>Best "Just Talk" Podcasts</Text>
-            <Text style={styles.moreLink}>View More</Text>
-            </View>
+  <FlatList 
+    style={{width:"100%",paddingTop:50,height:"auto"}}
+    keyExtractor={(item) => item.id} 
+    data={posts}
+    ItemSeparatorComponent={() =>   
+      <View style={styles.container}>
+        <View style={styles.header} >
+          <Text style={styles.title}>Best "Just Talk" Podcasts</Text>
+          <Text style={styles.moreLink}>View More</Text>
+        </View>
         <ScrollView style={styles.scrollContainer} horizontal={true} >
             <View style={styles.contentContainer}>
-            <VideoFrame />
-            <VideoFrame />
+              <VideoFrame />
+              <VideoFrame />
             </View>
         </ScrollView>
-        </View>
-        }
-        
-        renderItem={({item}) => (
-            <VideoFrameScroll navigation={navigation} props={item.data}  />
-        )}
-        />
+      </View>
+    }
+    renderItem={({item}) => (
+      <VideoFrameScroll navigation={navigation} props={item.data}  />
+    )}
+  />
 </View>
 )
 }
 
 const styles = StyleSheet.create({
-
     select:{
     flex: 1,
     flexDirection: 'row',

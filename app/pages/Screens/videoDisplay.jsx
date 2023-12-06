@@ -1,20 +1,35 @@
+//<***********************************>ß
+//LAST EDITED: 2023.12.06
+//EDITED BY: Orban Tamas
+//DESC: This page is the selected video detail page, it shows the selected video , comments and recommended videos
+//<***********************************>
+
+//BASIC IMPORTS
 import { View,Text,StyleSheet,SafeAreaView,Pressable,Image,Button,ScrollView,TouchableOpacity,FlatList } from "react-native"
+import React,{useRef,useEffect,useState} from "react"
+
+//COMPONENTS
 import { Rating } from 'react-native-ratings';
 import {Video} from "expo-av"
-import React,{useRef,useCallback,useEffect,useState,useMemo} from "react"
 import VideoFrameScroll from "../../components/HomePage/videoFrameScroll"
+import CommentBox from "../../components/VideoDisplay/commentBox";
+import WriteComment from "../../components/VideoDisplay/writeComment";
+import ReplyCommentBox from "../../components/VideoDisplay/replyCommentBox";
+import ClipSavingView from "../../components/VideoDisplay/videoTrimmer/clipSavingView";
 
+//CONTEXT
 import {BottomSheetModal,BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import "react-native-gesture-handler"
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+//ICONS
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import CommentBox from "../../components/VideoDisplay/commentBox";
-import WriteComment from "../../components/VideoDisplay/writeComment";
+
+//FIREBASE IMPORTS
 import { collection,query,orderBy,limit,getDocs,startAfter } from "firebase/firestore";
 import { db } from '../../firebase';
 import { useAuth } from "../../context/UserAuthContext";
-import ReplyCommentBox from "../../components/VideoDisplay/replyCommentBox";
-import ClipSavingView from "../../components/VideoDisplay/videoTrimmer/clipSavingView";
+
 
 const VideoPage= ({route,navigation}) => {
 
@@ -39,11 +54,13 @@ const [inReplyMode, setInReplyMode] = useState(false);
 const [posts, setPosts] = useState([]);
 const [lastPost, setLastPost] = useState(null);
 
-
 //COMMENTS PRELOAD
 const [comments, setComments] = useState([]);
-const [lastComment, setLastComment] = useState(null);
+
+//COMMENT TO REPLY
 const [commentToReply, setCommentToReply] = useState(null);
+
+//REPLY COMMENTS PRELOAD
 const [replyArray, setReplyArray] = useState([]);
 
 //Bottom Sheet Modal | Desc / Comment
@@ -78,10 +95,7 @@ const triggerCommentWrite = () => {
 //Bottom Sheet - Comment Input Write / Focus END (90%)
 const triggerCommentWriteEnd = () => {
     bottomSheetRef.current?.snapToIndex(2);
-
 }
-
-
 
 const fetchReply = async (commentID) => {
     const replyRef = collection(db,"videos",VideoData.id,"comments",commentID,"reply");
@@ -89,7 +103,6 @@ const fetchReply = async (commentID) => {
     const replyList = replySnapshot.docs.map(doc => doc.data());
     setReplyArray(replyList);
 }
-
 
 //Bottom Sheet REPLY MODE
 const handleReplyMode = (commentData) => {
@@ -106,10 +119,10 @@ const fetchMoreData = async () => {
     const querySnapshot = await getDocs(q);
     const tempPosts = [];
     querySnapshot.forEach((doc) => {
-      tempPosts.push({
-        id: doc.id,
-        data: doc.data(),
-      });
+        tempPosts.push({
+            id: doc.id,
+            data: doc.data(),
+        });
     });
     setPosts([...posts, ...tempPosts]);
 }
@@ -122,10 +135,10 @@ const fetchUserRecommendedVideos = async () => {
     const querySnapshot = await getDocs(q);
     const tempPosts = [];
     querySnapshot.forEach((doc) => {
-      tempPosts.push({
-        id: doc.id,
-        data: doc.data(),
-      });
+        tempPosts.push({
+            id: doc.id,
+            data: doc.data(),
+        });
     });
     setLastPost(tempPosts[tempPosts.length - 1].data.id);
     setPosts(tempPosts);
@@ -147,7 +160,7 @@ const fetchComments = async() => {
             data: doc.data(),
         });
     });
-    setLastComment(tempPosts[tempPosts.length - 1].data.id);
+    //setLastComment(tempPosts[tempPosts.length - 1].data.id);
     setComments(tempPosts);
 }
 
@@ -183,7 +196,6 @@ return (
                 <FlatList
                     ListHeaderComponent={  
                         <ScrollView>
-
                             {/* Title and Data Section */}
                             <Pressable onPress={handleDescOpen} style={({pressed}) => [
                             {
@@ -296,174 +308,143 @@ return (
                     )}
                 />
             </View>
-
             {/* Bottom Sheet Modal */}
             <BottomSheetModal
                 ref={bottomSheetRef}
                 snapPoints={snapPoints}
                 enablePanDownToClose={true}
-            
                 backgroundStyle={{backgroundColor:"white",borderTopLeftRadius:30,borderTopRightRadius:30}}
                 >
-                    {isCommentProvided?(
-                        !inReplyMode ? (
-                    
+                {isCommentProvided?(
+                    !inReplyMode ? 
+                        (
                             <View style={styles.bottomSheetComment} >
-                            <View style={{flexDirection:"row",justifyContent:"space-between",width:"100%",borderBottomColor:"gray",borderBottomWidth:2}}>
-                            <Text style={{fontWeight:"800",fontSize:22,paddingBottom:20,marginLeft:10}}>Comments</Text>
-                            <MaterialCommunityIcons
-                                name={'close'}
-                                size={25}
-                                color={"black"}
-                                style={{marginRight:20}}
-                                onPress={() => bottomSheetRef.current?.close()}
-                            />
+                                <View style={{flexDirection:"row",justifyContent:"space-between",width:"100%",borderBottomColor:"gray",borderBottomWidth:2}}>
+                                    <Text style={{fontWeight:"800",fontSize:22,paddingBottom:20,marginLeft:10}}>Comments</Text>
+                                    <MaterialCommunityIcons
+                                        name={'close'}
+                                        size={25}
+                                        color={"black"}
+                                        style={{marginRight:20}}
+                                        onPress={() => bottomSheetRef.current?.close()}
+                                    />
+                                </View>
+                                <ScrollView style={{maxHeight:"70%"}}  >
+                                    <FlatList
+                                        keyExtractor={(item) => item.id}
+                                        data={comments}
+                                        renderItem={({item}) => (
+                                            <CommentBox currentuser={currentuser} videoID={VideoData.id} replyOpenner={false} triggerReplyMode={() => handleReplyMode(item.data)} props={item.data} />
+                                        )}
+                                    />
+                                </ScrollView>
+                                <WriteComment  handleCommentWrite={triggerCommentWrite} handleCommentWriteEnd={triggerCommentWriteEnd} />
                             </View>
-
-                            <ScrollView style={{maxHeight:"70%"}}  >
-                                <FlatList
-                                    keyExtractor={(item) => item.id}
-                                    data={comments}
-                                    renderItem={({item}) => (
-                                        <CommentBox currentuser={currentuser} videoID={VideoData.id} replyOpenner={false} triggerReplyMode={() => handleReplyMode(item.data)} props={item.data} />
-                                    )}
-                                />
-                            </ScrollView>
-
-                            <WriteComment  handleCommentWrite={triggerCommentWrite} handleCommentWriteEnd={triggerCommentWriteEnd} />
-                        
-                        
-                        
-                        </View>
-                    
                         ):(
                             <View style={styles.bottomSheetComment} >
-                            <View style={{flexDirection:"row",justifyContent:"space-between",width:"100%",borderBottomColor:"gray",borderBottomWidth:2}}>
-                                <View style={{flexDirection:"row"}}>
-
-                            <MaterialCommunityIcons
-                            name={'arrow-left'}
-                            size={25}
-                            color={"black"}
-                            style={{marginRight:20}}
-                            onPress={() => setInReplyMode(false)}
-                        />
-                            <Text style={{fontWeight:"800",fontSize:22,paddingBottom:20,marginLeft:10}}>Reply</Text>
+                                <View style={{flexDirection:"row",justifyContent:"space-between",width:"100%",borderBottomColor:"gray",borderBottomWidth:2}}>
+                                    <View style={{flexDirection:"row"}}>
+                                        <MaterialCommunityIcons
+                                            name={'arrow-left'}
+                                            size={25}
+                                            color={"black"}
+                                            style={{marginRight:20}}
+                                            onPress={() => setInReplyMode(false)}
+                                        />
+                                        <Text style={{fontWeight:"800",fontSize:22,paddingBottom:20,marginLeft:10}}>Reply</Text>
+                                    </View>
+                                    <MaterialCommunityIcons
+                                        name={'close'}
+                                        size={25}
+                                        color={"black"}
+                                        style={{marginRight:20}}
+                                        onPress={() => bottomSheetRef.current?.close()}
+                                    />
+                                </View>
+                                <View style={{maxHeight:"70%"}}  >
+                                    <FlatList
+                                        keyExtractor={(item) => item.id}
+                                        data={replyArray}
+                                        ListHeaderComponent={
+                                            <CommentBox currentuser={currentuser} videoID={VideoData.id} triggerReplyMode={() => handleReplyMode()} replyOpenner={true} props={commentToReply} />
+                                        }
+                                        renderItem={({item}) => (
+                                            <ReplyCommentBox currentuser={currentuser} videoID={VideoData.id} commentID={commentToReply.id} triggerReplyMode={() => handleReplyMode()} props={item} />
+                                        )}
+                                    />
+                                </View>
+                                <WriteComment handleCommentWrite={triggerCommentWrite} handleCommentWriteEnd={triggerCommentWriteEnd} />
                             </View>
-
-
-                            <MaterialCommunityIcons
-                                name={'close'}
-                                size={25}
-                                color={"black"}
-                                style={{marginRight:20}}
-                                onPress={() => bottomSheetRef.current?.close()}
-                            />
-                            </View>
-
-                            <View style={{maxHeight:"70%"}}  >
-                                
-                                <FlatList
-                                    keyExtractor={(item) => item.id}
-                                    data={replyArray}
-                                    ListHeaderComponent={
-                                    <CommentBox currentuser={currentuser} videoID={VideoData.id} triggerReplyMode={() => handleReplyMode()} replyOpenner={true} props={commentToReply} />
-                                    }
-                                    renderItem={({item}) => (
-                                        <ReplyCommentBox currentuser={currentuser} videoID={VideoData.id} commentID={commentToReply.id} triggerReplyMode={() => handleReplyMode()} props={item} />
-                                    )}
-                                />
-                            </View>
-
-                            <WriteComment handleCommentWrite={triggerCommentWrite} handleCommentWriteEnd={triggerCommentWriteEnd} />
-                        
-                        
-                        
-                        </View>
                         )
-        
                     ):(
                         <View style={styles.bottomSheetComment} >
-                        <View style={{flexDirection:"row",justifyContent:"space-between",width:"100%",borderBottomColor:"gray",borderBottomWidth:2}}>
-                        <Text style={{fontWeight:"800",fontSize:22,paddingBottom:20,marginLeft:10}}>Description</Text>
-                        <MaterialCommunityIcons
-                            name={'close'}
-                            size={25}
-                            color={"black"}
-                            style={{marginRight:20}}
-                            onPress={() => bottomSheetRef.current?.close()}
-                        />
+                            <View style={{flexDirection:"row",justifyContent:"space-between",width:"100%",borderBottomColor:"gray",borderBottomWidth:2}}>
+                                <Text style={{fontWeight:"800",fontSize:22,paddingBottom:20,marginLeft:10}}>Description</Text>
+                                <MaterialCommunityIcons
+                                    name={'close'}
+                                    size={25}
+                                    color={"black"}
+                                    style={{marginRight:20}}
+                                    onPress={() => bottomSheetRef.current?.close()}
+                                />
+                            </View>
+                            <ScrollView>
+                                <View style={{flexDirection:"row",justifyContent:"space-evenly",width:"100%",alignItems:"center"}}>
+                                    {/* CATEGORY 1 */}
+                                    <View style={styles.descRow}>
+                                        <Text style={styles.textHighlighter}>1.2M</Text>
+                                        <Text style={styles.textSubHighlighter}>Views</Text>
+                                    </View>
+                                    {/* CATEGORY 2 */}
+                                    <View style={styles.descRow}>
+                                        <Text style={styles.textHighlighter}>4.77</Text>
+                                        <Text style={styles.textSubHighlighter}>Overal Rate</Text>
+                                    </View>
+                                    {/* CATEGORY 3 */}
+                                    <View style={styles.descRow}>
+                                        <Text style={styles.textHighlighter}>Health</Text>
+                                        <Text style={styles.textSubHighlighter}>Category</Text>
+                                    </View>    
+                                </View>
+                                <View style={{flexDirection:"row",justifyContent:"space-evenly",width:"100%",alignItems:"center"}}>
+                                    {/* CATEGORY 4 */}
+                                    <View style={styles.descRow}>
+                                        <Text style={styles.textHighlighter}>2003.11.17</Text>
+                                        <Text style={styles.textSubHighlighter}>Uploaded</Text>
+                                    </View>
+                                    {/* CATEGORY 5 */}
+                                    <View style={styles.descRow}>
+                                        <Text style={styles.textHighlighter}>01:00:12</Text>
+                                        <Text style={styles.textSubHighlighter}>Duration</Text>
+                                    </View>
+                                </View>
+
+                                <View style={{margin:20,marginBottom:10}}>
+                                    <Text numberOfLines={4} ellipsizeMode="tail" >Description Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae aliquam sapiente qui deleniti sit rerum quae repellat autem mollitia aperiam, quis voluptate architecto voluptates earum aspernatur delectus quas doloribus soluta.</Text>
+                                    <TouchableOpacity>
+                                        <Text style={{marginTop:5,fontWeight:"600"}}>...Show More</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                                <View style={{margin:20}}>
+                                    <Text style={{fontWeight:"800",fontSize:20}}>Cast Members</Text>
+                                    <View style={{flexDirection:"row",justifyContent:"space-evenly",flexWrap:"wrap",maxWidth:400,width:"100%",alignItems:"center",marginTop:40}}>
+                                        <Text>Joe ROgan</Text>
+                                        <Text>Elon Musk</Text>
+                                        <Text>Joe ROgan</Text>
+                                    </View>
+                                </View>
+
+                                <View style={{margin:20,marginBottom:250}}>
+                                    <Text style={{fontWeight:"800",fontSize:20}}>Related</Text>
+                                    <View style={{flexDirection:"row",justifyContent:"space-evenly",flexWrap:"wrap",maxWidth:400,width:"100%",alignItems:"center",marginTop:15}}>
+                                        <Text>Shorts</Text>
+                                    </View>
+                                </View>
+                            </ScrollView>
                         </View>
-
-                        <ScrollView>
-                            <View style={{flexDirection:"row",justifyContent:"space-evenly",width:"100%",alignItems:"center"}}>
-                                <View style={styles.descRow}>
-                                    <Text style={styles.textHighlighter}>1.2M</Text>
-                                    <Text style={styles.textSubHighlighter}>Views</Text>
-                                </View>
-
-                                <View style={styles.descRow}>
-                                    <Text style={styles.textHighlighter}>4.77</Text>
-                                    <Text style={styles.textSubHighlighter}>Overal Rate</Text>
-                                </View>
-
-
-                                <View style={styles.descRow}>
-                                    <Text style={styles.textHighlighter}>Health</Text>
-                                    <Text style={styles.textSubHighlighter}>Category</Text>
-                                </View>
-                            
-                                
-                            </View>
-
-                            <View style={{flexDirection:"row",justifyContent:"space-evenly",width:"100%",alignItems:"center"}}>
-
-                            <View style={styles.descRow}>
-                                    <Text style={styles.textHighlighter}>2003.11.17</Text>
-                                    <Text style={styles.textSubHighlighter}>Uploaded</Text>
-                                </View>
-
-                                <View style={styles.descRow}>
-                                    <Text style={styles.textHighlighter}>01:00:12</Text>
-                                    <Text style={styles.textSubHighlighter}>Duration</Text>
-                                </View>
-                            
-                                
-                            </View>
-
-                            <View style={{margin:20,marginBottom:10}}>
-                                <Text numberOfLines={4} ellipsizeMode="tail" >Description Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae aliquam sapiente qui deleniti sit rerum quae repellat autem mollitia aperiam, quis voluptate architecto voluptates earum aspernatur delectus quas doloribus soluta.</Text>
-                                <TouchableOpacity>
-                                <Text style={{marginTop:5,fontWeight:"600"}}>...Show More</Text>
-                                </TouchableOpacity>
-                            </View>
-
-                            <View style={{margin:20}}>
-                                <Text style={{fontWeight:"800",fontSize:20}}>Cast Members</Text>
-                                <View style={{flexDirection:"row",justifyContent:"space-evenly",flexWrap:"wrap",maxWidth:400,width:"100%",alignItems:"center",marginTop:40}}>
-                                    <Text>Joe ROgan</Text>
-                                    <Text>Elon Musk</Text>
-                                    <Text>Joe ROgan</Text>
-                                </View>
-                            </View>
-
-                            <View style={{margin:20,marginBottom:250}}>
-                                <Text style={{fontWeight:"800",fontSize:20}}>Related</Text>
-                                <View style={{flexDirection:"row",justifyContent:"space-evenly",flexWrap:"wrap",maxWidth:400,width:"100%",alignItems:"center",marginTop:15}}>
-                                    <Text>Shorts</Text>
-                                
-                                </View>
-                            </View>
-                        </ScrollView>
-
-                        
-                    
-                    
-                    </View>
                     )
-                    }
-            
-
+                }
             </BottomSheetModal>
 
             <BottomSheetModal
@@ -484,15 +465,10 @@ return (
                             onPress={() => bottomSheetRef2.current?.close()}
                         />
                     </View>
-
                     {/* CLIP SAVE */}
                     <ClipSavingView videoURL={VideoData.video} />
-
                 </View>
-
             </BottomSheetModal>
-
-
         </SafeAreaView> 
     </ BottomSheetModalProvider>
 </GestureHandlerRootView>
@@ -503,11 +479,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-      },
-      video: {
+    },
+    video: {
         width: '100%',
         aspectRatio: 16 / 9,
-      },
+    },
         desc:{
             marginTop:10,
             marginLeft:10,
