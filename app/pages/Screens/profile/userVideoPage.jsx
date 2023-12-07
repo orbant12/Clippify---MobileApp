@@ -1,9 +1,17 @@
 
-import { View, Text,ScrollView,FlatList } from 'react-native';
-import VideoFrameScroll from '../../../components/HomePage/videoFrameScroll';
-import { collection, doc, setDoc,getDoc,query,orderBy,limit,getDocs,startAfter } from "firebase/firestore";
-import { db } from '../../../firebase';
+
+//BASIC IMPORTS
+import { View,FlatList } from 'react-native';
 import React, {useEffect, useState} from 'react';
+
+//COMPONENTS
+import VideoFrameScroll from '../../../components/HomePage/videoFrameScroll';
+
+//FIREBASE
+import { collection,query,orderBy,limit,getDocs,startAfter } from "firebase/firestore";
+import { db } from '../../../firebase';
+
+//CONTEXT
 import { useAuth } from '../../../context/UserAuthContext';
 
 const UserVideoPage = ({navigation}) => {

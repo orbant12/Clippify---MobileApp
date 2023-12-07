@@ -8,27 +8,26 @@
 import { View,Text,StyleSheet,Image,TouchableOpacity } from "react-native"
 import React, { useEffect, useState } from 'react';
 
-//COMPONENTS
-import UserVideoPage from "../pages/Screens/profile/userVideoPage"
-import UserClipsPage from "../pages/Screens/profile/userClipsPage"
-import UserSavedPage from "../pages/Screens/profile/userSavedPage"
+import UserVideoPage from "./profile/userVideoPage";
 
 //ASSETS
 import { Tabs} from 'react-native-collapsible-tab-view'
 import Entypo from 'react-native-vector-icons/Entypo';
 
 //CONTEXT
-import { useAuth } from "../context/UserAuthContext";
+import { useAuth } from "../../context/UserAuthContext";
 
 //FIREBASE
-import { doc,getDoc } from "firebase/firestore";
-import { db } from '../firebase';
-import AchivementPage from "./Screens/profile/userAchivementPage";
+import { collection, doc,getDoc,setDoc,getDocs,deleteDoc,updateDoc } from "firebase/firestore";
+import { db } from '../../firebase';
 
 
-const Profile = ({navigation,handleSettings}) => {
+const VisitedProfile = ({navigation,handleSettings,route}) => {
 
 //<********************VARIABLES************************>
+
+//USER DATA FROM PARAMS
+const uploaderData = route.params.data;
 
 //CURRENT USER DATA
 const [userData, setUserData] = useState([]);
@@ -36,14 +35,38 @@ const [userData, setUserData] = useState([]);
 //CURRENT USER
 const {currentuser} = useAuth();
 
+//IS FOLLOWED
+const [isFollowed, setIsFollowed] = useState(false);
+
+//FOLLOWER ARRAY
+const [followerArray, setFollowerArray] = useState([]);
+
 //<********************FUNCTIONS************************>
+
+const fetchFollowers = async (uploader) => {
+    if(currentuser){
+        const followerRef = collection(db, "users", uploader,"Followers");
+        const followerSnap = await getDocs(followerRef);
+        const followerList = followerSnap.docs.map(doc => doc.data());
+        setFollowerArray(followerList)
+        const userRef = doc(db, "users", uploader);
+        await updateDoc(userRef, {
+            followers: followerList.length
+        });
+        if (followerList.some(follower => follower.id === currentuser.uid)) {
+            setIsFollowed(true)
+        }
+    }
+}
+
 
 //FETCH CURRENT USER DATA
 const fetchUserData = async () => {
-    const userRef = doc(db, "users", currentuser.uid);
+    const userRef = doc(db, "users", uploaderData.uploader_id);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
         setUserData(userSnap.data());
+        fetchFollowers(userSnap.data().id);
     } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
@@ -60,10 +83,39 @@ const handleNavigation = (page) => {
     }
 }
 
+const handleFollow = async () => {
+    if(currentuser){
+        if (isFollowed === false) {
+        const userRef = doc(db, "users",userData.id,"Followers",currentuser.uid);
+        const uploaderRef = doc(db, "users",currentuser.uid,"Following",userData.id);
+        await setDoc(userRef,{
+            id:currentuser.uid
+        })
+        await setDoc(uploaderRef,{
+            id: userData.id,
+        })
+        setIsFollowed(true)
+        }else if (isFollowed  === true) {
+            const userRef = doc(db, "users", userData.id,"Followers",currentuser.uid);
+            const uploaderRef = doc(db, "users",currentuser.uid,"Following",userData.id);
+            if(followerArray.some(follower => follower.id === currentuser.uid)){
+                await deleteDoc(userRef)
+                await deleteDoc(uploaderRef)
+            }
+            setIsFollowed(false)
+        }
+    }else{
+        alert("You need to be logged in to follow")
+    }
+}
+
+
+
 //ON PAGE LOAD
 useEffect(() => {
     //1.) Fetch the user data
     fetchUserData();
+    //2.) Check if the user is followed
 }, []);
 
 
@@ -109,13 +161,17 @@ return(
     </View>
 
     <View style={{flexDirection:"row",width:"50%", marginLeft:"auto",marginRight:"auto",justifyContent:"space-evenly"}}>
-        <TouchableOpacity onPress={() => handleNavigation("Account")} style={styles.followBTN}>
-            <Text style={{color:"white",fontWeight:"600"}}>Account</Text>
+        {!isFollowed ? (
+        <TouchableOpacity onPress={() => handleFollow()} style={styles.followBTN}>
+            <Text style={{color:"white",fontWeight:"600"}}>Follow</Text>
         </TouchableOpacity>
+        ):(
+            <TouchableOpacity onPress={() => handleFollow()} style={styles.followBTN}>
+                <Text style={{color:"white",fontWeight:"600"}}>Unfollow</Text>
+            </TouchableOpacity>
+        )}
 
-        <TouchableOpacity onPress={() => handleNavigation("Creator Panel")} style={styles.followBTN}>
-            <Text style={{color:"white",fontWeight:"600"}}>Channel</Text>
-        </TouchableOpacity>
+
     </View>
     <Text>{userData.description}</Text>
 </View>
@@ -135,38 +191,6 @@ return (
         >
             <Tabs.ScrollView>
                 <UserVideoPage navigation={navigation} />
-            </Tabs.ScrollView>
-        </Tabs.Tab>
-
-        {/* CLIPS PAGE */}
-        <Tabs.Tab 
-            name="C"
-            label={() => <Entypo name={'video'} size={25} color={"black"} />}
-        >
-            <Tabs.ScrollView>
-                <UserClipsPage navigation={navigation} />
-            </Tabs.ScrollView>
-        </Tabs.Tab>
-
-        {/* SAVED PAGE */}
-        <Tabs.Tab 
-            name="D"
-            label={() => <Entypo name={'save'} size={25} color={"black"} />}
-        >
-        
-            <Tabs.ScrollView>
-                <UserSavedPage />
-            </Tabs.ScrollView>
-        </Tabs.Tab>
-
-        {/* COMMUNITY PAGE */}
-        <Tabs.Tab 
-            name="B"
-            label={() => <Entypo name={'trophy'} size={25} color={"black"} />}
-            activeColor={"red"}
-        >
-            <Tabs.ScrollView>
-                <AchivementPage />
             </Tabs.ScrollView>
         </Tabs.Tab>
 
@@ -225,4 +249,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Profile
+export default VisitedProfile

@@ -5,15 +5,15 @@
 //<********************************************>
 
 //BASIC IMPORTS
-import { View,Text,StyleSheet,ScrollView } from "react-native"
+import { View,Text,StyleSheet,ScrollView, FlatList } from "react-native"
 import React, {useState, useEffect } from "react"
 
 //COMPONENTS
 import InboxFollowedProfile from "../components/Inbox/followedProfile"
-import MailRow from "../components/Inbox/mailRow"
+import SystemAlertMail from "../components/Inbox/mailRow"
 
 //FIREBASE
-import { collection,query,orderBy,getDocs } from "firebase/firestore";
+import { collection,getDocs, limit,query,where,orderBy } from "firebase/firestore";
 import { db } from '../firebase';
 
 //CONTEXT
@@ -30,14 +30,15 @@ const { currentuser } = useAuth();
 //FOLLOWED CASTS | LIST
 const [followedCasts, setFollowedCasts] = useState([]);
 
+//NOTIFICATIONS | LIST
+const [notifications, setNotifications] = useState([]);
 
 //<********************FUNCTIONS************************>
 
 //FETCH FOLLOWED CASTS | LIST
 const fetchFollowedCasts = async () => {
-    const videoRef = collection(db, "users",currentuser.uid,"Following");
-    const q = query(videoRef, orderBy("id", "desc"));
-    const querySnapshot = await getDocs(q);
+    const videoRef = collection(db, "users",currentuser.uid,"Following");;
+    const querySnapshot = await getDocs(videoRef);
     const tempPosts = [];
     querySnapshot.forEach((doc) => {
         tempPosts.push({
@@ -48,9 +49,26 @@ const fetchFollowedCasts = async () => {
     setFollowedCasts(tempPosts);
 }
 
+//FETCH NOTIFICATIONS
+const fetchNotifications = async () => {
+    const inboxRef = collection(db, "users",currentuser.uid,"Inbox");
+    const q = query(inboxRef, orderBy("recived_at", "desc"),limit(10));
+    const querySnapshot = await getDocs(q);
+    const tempPosts = [];
+    querySnapshot.forEach((doc) => {
+        tempPosts.push({
+            id: doc.id,
+            data: doc.data(),
+        });
+    });
+    setNotifications(tempPosts);
+}
+
 useEffect(() => {
     //1.) Fetch the data
     fetchFollowedCasts();
+    //2.) Fetch Notifications
+    fetchNotifications();
 }, [])
 
 return (
@@ -73,9 +91,13 @@ return (
             <Text style={styles.title}>Your Mail</Text>
         </View>
         <View style={styles.mailsContainer}>
-            <MailRow />
-            <MailRow />
-            <MailRow />
+            <FlatList
+                data={notifications}
+                renderItem={({ item }) => (
+                    <SystemAlertMail props={item.data} />
+                )}
+                keyExtractor={(item) => item.id}
+            />
         </View>
     </ScrollView>
             

@@ -57,12 +57,6 @@ return(
           <Text style={styles.title}>Best "Just Talk" Podcasts</Text>
           <Text style={styles.moreLink}>View More</Text>
         </View>
-        <ScrollView style={styles.scrollContainer} horizontal={true} >
-            <View style={styles.contentContainer}>
-              <VideoFrame />
-              <VideoFrame />
-            </View>
-        </ScrollView>
       </View>
     }
     renderItem={({item}) => (

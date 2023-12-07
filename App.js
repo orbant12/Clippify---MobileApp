@@ -18,6 +18,7 @@ import SelectedCategoryPage from "./app/pages/Screens/selectedCategory";
 import SettingsPage from "./app/pages/Screens/SettingsPage"
 import GeneralSettings from "./app/pages/Screens/generalSettings/generalSettings"
 import EpisodeEdit from "./app/pages/Screens/generalSettings/creatorSettings/episodeEdit"
+import VisitedProfile from "./app/pages/Screens/visitedProfile"
 
 //CREATING THE NAVIGATION STACK
 const Stack = createNativeStackNavigator();
@@ -35,6 +36,7 @@ return (
             <Stack.Screen name="SettingsPage" component={SettingsPage} options={{ headerShown:true,title:"Settings"}} />
             <Stack.Screen name="GeneralSettings" component={GeneralSettings}   options={({ route }) => ({ title: route.params.data })} />
             <Stack.Screen name="EpisodeEdit" component={EpisodeEdit}   options={{ headerShown:true,title:"Manage Episodes"}} />
+            <Stack.Screen name="VisitedProfile" component={VisitedProfile}   options={({ route }) => ({ title: route.params.data.uploader_fullname })} />
         </ Stack.Navigator>
     </UserAuthContext>
 </NavigationContainer>   

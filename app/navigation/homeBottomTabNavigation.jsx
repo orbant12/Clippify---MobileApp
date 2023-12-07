@@ -80,6 +80,7 @@ return (
                   type='material'
                   color='black'
                   size={25}
+                  onPress={() => navigation.navigate("Inbox")}
                 />
               </View>
             </View>

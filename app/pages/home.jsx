@@ -9,7 +9,7 @@ import React, {useEffect, useState} from 'react';
 import { ScrollView,StyleSheet,Text,View,FlatList } from 'react-native';
 
 //FIREBASE
-import { collection,query,orderBy,limit,getDocs, startAfter } from "firebase/firestore";
+import { collection,query,orderBy,limit,getDocs, startAfter, where } from "firebase/firestore";
 import { db } from '../firebase';
 
 //COMPONENTS
@@ -22,6 +22,9 @@ export default function TabOneScreen({navigation}) {
 
 //PODCAST POSTS
 const [posts, setPosts] = useState([]);
+
+//HEALTH PODCASTS
+const [healthPodcasts, setHealthPodcasts] = useState([]);
 
 //PODCAST POSTS | PAGINATION
 const [lastPost, setLastPost] = useState(null);
@@ -60,10 +63,27 @@ const fetchUserRecommendedVideos = async () => {
   setPosts(tempPosts);
 }
 
+//FETCH HEALTH PODCASTS
+const fetchHealthPodcasts = async () => {
+  const videoRef = collection(db, "videos");
+  const field = "video_category";
+  const q = query(videoRef, orderBy(field),where(field,"==","Health") , limit(3));
+  const querySnapshot = await getDocs(q);
+  const tempPosts = [];
+  querySnapshot.forEach((doc) => {
+    tempPosts.push({
+      id: doc.id,
+      data: doc.data(),
+    });
+  });
+  setHealthPodcasts(tempPosts);
+}
+
 //ON PAGE LOAD
 useEffect(() => {
   //1.) FETCH PODCASTS
   fetchUserRecommendedVideos();
+  fetchHealthPodcasts();
 }, []);
 
 
@@ -73,16 +93,17 @@ return (
     style={{width:"100%",marginTop:90}}
     keyExtractor={(item) => item.id} 
     data={posts}
-    ItemSeparatorComponent={() =>   
+    ItemSeparatorComponent={() =>
       <View style={styles.container}>
         <View style={styles.header} >
-          <Text style={styles.title}>Best "Just Talk" Podcasts</Text>
-          <Text style={styles.moreLink}>View More</Text>
+          <Text style={styles.title}>Best "Health" Podcasts</Text>
+          <Text style={styles.moreLink} onPress={() => navigation.navigate("SelectedCategoryPage",{category:"Health"})} >View More</Text>
         </View>
       <ScrollView style={styles.scrollContainer} horizontal={true} >
         <View style={styles.contentContainer}>
-          <VideoFrame />
-          <VideoFrame />
+          {healthPodcasts.map((podcast) => (
+            <VideoFrame navigation={navigation} props={podcast.data} />
+          ))} 
         </View>
       </ScrollView>
       </View>
@@ -100,8 +121,7 @@ return (
     </View>
     <ScrollView style={styles.scrollContainer} horizontal={true} >
       <View style={styles.contentContainer}>
-        <VideoFrame />
-        <VideoFrame />
+
       </View>
     </ScrollView>
   </View>
@@ -112,8 +132,7 @@ return (
     </View>
     <ScrollView style={styles.scrollContainer} horizontal={true} >
       <View style={styles.contentContainer}>
-        <VideoFrame />
-        <VideoFrame />
+ 
       </View>
     </ScrollView>
   </View>

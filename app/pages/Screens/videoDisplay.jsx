@@ -8,6 +8,8 @@
 import { View,Text,StyleSheet,SafeAreaView,Pressable,Image,Button,ScrollView,TouchableOpacity,FlatList } from "react-native"
 import React,{useRef,useEffect,useState} from "react"
 
+import * as Sharing from 'expo-sharing';
+
 //COMPONENTS
 import { Rating } from 'react-native-ratings';
 import {Video} from "expo-av"
@@ -169,6 +171,11 @@ const handleCLipSaving = () => {
     bottomSheetRef2.current?.present();
 }
 
+//SHARE VIDEO
+const handleVideoShare = () => {
+    Sharing.shareAsync(VideoData.video);
+}
+
 //ON LOAD FUNCTIONS
 useEffect(() => {
     //1.) Preload Recommended Videos
@@ -210,11 +217,12 @@ return (
                             {/* Uploader Section */}
                             <View style={styles.uploaderSection}>
                                 <View style={{flexDirection:"row",alignItems:"center",width:"50%",marginLeft:10}}>
+                                    <Pressable onPress={() => navigation.navigate("VisitedProfile",{data:VideoData})}>
                                     <Image
-                                    style={[styles.profilePicture]}
-                                    source={{uri: VideoData.uploader_avatar}}
-                                
+                                        style={[styles.profilePicture]}
+                                        source={{uri: VideoData.uploader_avatar}}
                                     />
+                                    </Pressable>
                                     <Text style={{paddingLeft:10,maxWidth:130}} numberOfLines={1} ellipsizeMode="tail" >{VideoData.uploader_fullname}</Text>
                                     <Text style={{paddingLeft:20}}>{VideoData.uploader_followers}</Text>
                                 </View>
@@ -240,7 +248,7 @@ return (
                         
                                 </View>
                                 <ScrollView horizontal>
-                                    <TouchableOpacity style={styles.buttonStyle} onPress={() => alert("hey")}> 
+                                    <TouchableOpacity style={styles.buttonStyle} onPress={() => handleVideoShare()}> 
                                         <Text>Share</Text>
                                     </TouchableOpacity>
                                     
