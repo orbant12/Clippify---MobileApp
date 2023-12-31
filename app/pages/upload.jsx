@@ -301,12 +301,12 @@ return (
     pages={[
     // 1.) UPLOAD PODCAST
     {
-      backgroundColor: '#fff',
+      backgroundColor: '#18191a',
       image: <Image source={{uri: "https://picsum.photos/200/300"}} />,
       title: 
         <View style={{flex:1,marginTop:15,alignItems:"center"}}>
-          <Text style={{fontWeight:"600",fontSize:18}}>Upload Your Clip</Text>
-          <Text style={{marginTop:10}}>Edit the length you'd like to upload</Text>
+          <Text style={{fontWeight:"600",fontSize:18,color:"white"}}>Upload Your Clip</Text>
+          <Text style={{marginTop:10,color:"white"}}>Edit the length you'd like to upload</Text>
           {videoURL.length > 0 ? (
           <>
             <Video
@@ -324,7 +324,7 @@ return (
             </View>
           </>
           ) : (
-          <TouchableOpacity onPress={() => pickImage("Videos")} style={{marginTop:150,padding:10,backgroundColor:"black",borderRadius:10}}>
+          <TouchableOpacity onPress={() => pickImage("Videos")} style={{marginTop:150,padding:10,backgroundColor:"black",borderRadius:10,borderColor:"#9effb1",borderWidth:1}}>
             <Text style={{color:"white",fontWeight:"600"}}>Select Image</Text>
           </TouchableOpacity>
           )}
@@ -332,28 +332,28 @@ return (
     },
     // 2.) ADD DETAILS
     {
-      backgroundColor: 'white', 
+      backgroundColor: '#0f1011', 
       title: 
       <GestureHandlerRootView style={{ flex: 1,width:"100%" }}>
       <BottomSheetModalProvider>
         <View style={{flex:1,marginTop:15,alignItems:"center",width:"100%",flexDirection:"column"}}>
-          <Text style={{fontWeight:"600",fontSize:18}}>Add Details</Text>
-          <Text style={{marginTop:10}}>Make it your own</Text>
+          <Text style={{fontWeight:"600",fontSize:18,color:"white"}}>Add Details</Text>
+          <Text style={{marginTop:10,color:"white"}}>Make it your own</Text>
           <View style={{width:"100%",marginTop:50}}>
               <View style={{width:"80%",flexDirection:"column",justifyContent:"space-evenly",marginLeft:"auto",marginRight:"auto"}}>
                   <View style={{flexDirection:"row",width:"100%",justifyContent:"space-between"}}>
-                    <Text style={{fontSize:16,fontWeight:"600",marginBottom:10}}>Title</Text>
+                    <Text style={{fontSize:16,fontWeight:"600",marginBottom:10,color:"white"}}>Title</Text>
                     <Text>{videoTitle.length}</Text>
                   </View>
-                  <TextInput onChange={handleVideoTitle} numberOfLines={1} style={{width:"100%",padding:10,borderBlockColo:"black",borderWidth:1, borderRadius:5}} placeholder="Type here..." />
+                  <TextInput onChange={handleVideoTitle} numberOfLines={1} style={{width:"100%",padding:10,borderColor:"white",color:"white",borderWidth:1, borderRadius:5}} placeholder="Type here..." />
               </View>
           </View>
           <View style={{width:"100%",marginTop:50}}>
             <View style={{width:"80%",flexDirection:"column",justifyContent:"space-evenly",marginLeft:"auto",marginRight:"auto"}}>
               <View style={{flexDirection:"row",width:"100%",justifyContent:"space-between"}}>
-                <Text style={{fontSize:16,fontWeight:"600",marginBottom:10}}>Folder</Text>
+                <Text style={{fontSize:16,fontWeight:"600",marginBottom:10,color:"white"}}>Folder</Text>
               </View>
-              <Pressable onPress={handleFolderBottomSheetOpen}><Text style={{padding:20,backgroundColor:"transparent",color:"black",textAlign:"center",borderRadius:30,borderWidth:2,borderColor:"black"}}>Select Folder</Text></Pressable>
+              <Pressable onPress={handleFolderBottomSheetOpen}><Text style={{padding:20,backgroundColor:"transparent",color:"white",textAlign:"center",borderRadius:30,borderWidth:2,borderColor:"#9effb1"}}>Select Folder</Text></Pressable>
             </View>
           </View>
         </View>
@@ -381,31 +381,31 @@ return (
     },
     // 3.) ADD THUBNAIL
     {
-      backgroundColor: '#fff',
+      backgroundColor: 'black',
       image: <Image source={{uri: "https://picsum.photos/200/300"}} />,
       title:
         <GestureHandlerRootView style={{ flex: 1 }}>
           <BottomSheetModalProvider>
             <View style={{flex:1,marginTop:15,alignItems:"center"}}>
-              <Text style={{fontWeight:"600",fontSize:18}}>Additional Essentials</Text>
-              <Text style={{marginTop:10}}>Select category to be more organised...</Text>
+              <Text style={{fontWeight:"600",fontSize:18,color:"white"}}>Additional Essentials</Text>
+              <Text style={{marginTop:10,color:"white"}}>Select category to be more organised...</Text>
 
               <View style={!thubnailURL.length > 0 ? {width:"100%",marginTop:50,alignItems:"center"} : {width:"100%",marginTop:-100,alignItems:"center"}} >
                 {selectedCategory !== "" ? (
                   <View style={{marginTop:150,alignItems:"center"}}>
                     <View style={{flexDirection:"row",marginBottom:20}}>
-                      <Text>Category: </Text>
+                      <Text style={{color:"white"}}>Category: </Text>
                       <TouchableOpacity onPress={triggerCategorySheet}>
-                      <Text style={{fontWeight:"800"}}>{selectedCategory}</Text>
+                      <Text style={{fontWeight:"800",color:"white"}}>{selectedCategory}</Text>
                       </TouchableOpacity>
                     </View>
                     
-                    <TouchableOpacity onPress={() => triggerCategorySheet()} style={{padding:10,backgroundColor:"black",borderRadius:10}}>
+                    <TouchableOpacity onPress={() => triggerCategorySheet()} style={{padding:10,borderColor:"#9effb1",borderWidth:1,backgroundColor:"#18191a",borderRadius:10}}>
                       <Text style={{color:"white",fontWeight:"600"}}>Edit Category</Text>
                     </TouchableOpacity>
                   </View>
                 ):(
-                  <TouchableOpacity onPress={() => triggerCategorySheet()} style={{marginTop:150,width:"70%",paddingBottom:20,paddingTop:20,marginRight:"auto",marginLeft:"auto",backgroundColor:"black",borderRadius:10,alignItems:"center"}}>
+                  <TouchableOpacity onPress={() => triggerCategorySheet()} style={{marginTop:150,width:"70%",paddingBottom:20,paddingTop:20,marginRight:"auto",marginLeft:"auto",borderWidth:1,borderColor:"#9effb1",backgroundColor:"#18191a",borderRadius:10,alignItems:"center"}}>
                     <Text style={{color:"white",fontWeight:"600"}}>Select Category</Text>
                   </TouchableOpacity>
                 )}
@@ -414,12 +414,12 @@ return (
                 ref={bottomSheetRef}
                 snapPoints={snapPoints}
                 enablePanDownToClose={true}
-                handleIndicatorStyle={{backgroundColor:"white"}}
+                handleIndicatorStyle={{backgroundColor:"#9effb1"}}
                 containerStyle={thubnailURL.length > 0 ? {width:"70%",marginRight:"auto",marginLeft:56}:{width:"70%"}}
-                backgroundStyle={{backgroundColor:"black",borderTopLeftRadius:30,borderTopRightRadius:30}}
+                backgroundStyle={{backgroundColor:"#18191a",borderTopLeftRadius:30,borderTopRightRadius:30}}
               >
-                <ScrollView style={{width:"100%",backgroundColor:"white",borderWidth:2,borderColor:"black"}}>
-                  <Pressable onPress={() => handlePickedCategory("Health")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between",borderTopWidth:2}}>
+                <ScrollView style={{width:"100%",backgroundColor:"white",borderWidth:2,borderColor:"#18191a"}}>
+                  <Pressable onPress={() => handlePickedCategory("Health")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between",borderTopWidth:2}}>
                     <Text>Health</Text>
                     <MaterialCommunityIcons
                     name="medical-bag"
@@ -428,7 +428,7 @@ return (
                       />
                   </Pressable>
 
-                  <Pressable onPress={() => handlePickedCategory("Fitness")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                  <Pressable onPress={() => handlePickedCategory("Fitness")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between"}}>
                     <Text>Fitness</Text>
                     <MaterialCommunityIcons
                       name="dumbbell"
@@ -437,7 +437,7 @@ return (
                     />
                   </Pressable>
 
-                  <Pressable onPress={() => handlePickedCategory("Business")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                  <Pressable onPress={() => handlePickedCategory("Business")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between"}}>
                     <Text>Business</Text>
                     <MaterialCommunityIcons
                     name="handshake"
@@ -446,7 +446,7 @@ return (
                     />
                   </Pressable>
 
-                  <Pressable onPress={() => handlePickedCategory("Finance")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                  <Pressable onPress={() => handlePickedCategory("Finance")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between"}}>
                     <Text>Finance</Text>
                     <MaterialCommunityIcons
                       name="cash"
@@ -455,7 +455,7 @@ return (
                     />
                   </Pressable>
 
-                  <Pressable onPress={() => handlePickedCategory("Science")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                  <Pressable onPress={() => handlePickedCategory("Science")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between"}}>
                     <Text>Science</Text>
                     <MaterialCommunityIcons
                       name="atom"
@@ -464,7 +464,7 @@ return (
                     />
                   </Pressable>
 
-                  <Pressable onPress={() => handlePickedCategory("Comedy")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                  <Pressable onPress={() => handlePickedCategory("Comedy")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between"}}>
                     <Text>Comedy</Text>
                     <MaterialCommunityIcons
                       name="drama-masks"
@@ -473,7 +473,7 @@ return (
                     />
                   </Pressable>
 
-                  <Pressable onPress={() => handlePickedCategory("Music")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                  <Pressable onPress={() => handlePickedCategory("Music")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between"}}>
                     <Text>Music</Text>
                     <MaterialCommunityIcons
                       name="music-note"
@@ -482,7 +482,7 @@ return (
                     />
                   </Pressable>
 
-                  <Pressable onPress={() => handlePickedCategory("History")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between"}}>
+                  <Pressable onPress={() => handlePickedCategory("History")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between"}}>
                     <Text>History</Text>
                     <MaterialCommunityIcons
                       name="bookshelf"
@@ -491,7 +491,7 @@ return (
                     />
                   </Pressable>
 
-                  <Pressable onPress={() => handlePickedCategory("Politics")} style={{width:"100%",borderWidth:1,padding:15,flexDirection:"row",justifyContent:"space-between",borderBottomWidth:2}}>
+                  <Pressable onPress={() => handlePickedCategory("Politics")} style={{width:"100%",borderWidth:1,borderColor:"#9effb1",padding:15,flexDirection:"row",justifyContent:"space-between",borderBottomWidth:2}}>
                     <Text>Politics</Text>
                     <MaterialCommunityIcons
                       name="account-voice"

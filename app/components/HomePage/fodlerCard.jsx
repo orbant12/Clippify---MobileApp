@@ -14,7 +14,7 @@ return(
             <Text style={styles.title}>
                 {props.title}
             </Text>
-            <Text>
+            <Text style={{ color:"white",}}>
                 Files: {props.files_count}
             </Text>
         </View>
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: 'black',
+        borderColor: '#9effb1',
         justifyContent: 'space-between',
         padding: 10,
         borderWidth: 1,
@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     },
     title:{
         fontSize:20,
+        color:"white",
         fontWeight:"bold"
     }
 })

@@ -122,6 +122,7 @@ return (
     <Tabs.Container
         renderHeader={Header}
         style={{backgroundColor:"white"}}
+        se
     >
 
         {/* CLIPS PAGE */}
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
     rowOne: {
         alignItems: 'center',
         paddingTop: 50,
-        backgroundColor: 'transparent',
+        backgroundColor: '#18191a',
         borderBottomWidth:3,
         height:350,
         borderBottomColor:"black",

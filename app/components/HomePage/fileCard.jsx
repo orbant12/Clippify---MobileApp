@@ -33,7 +33,9 @@ return(
 
 const styles = StyleSheet.create({
     boxContainer: {
-        width: 300,
+        width: "100%",
+        marginRight:"auto",
+        marginLeft:"auto",
         height: 130,
         borderRadius: 10,
         justifyContent: 'center',
@@ -41,7 +43,8 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         justifyContent: 'space-between',
         padding: 10,
-        borderWidth: 1,
+        borderTopWidth: 1,
+        borderBottomWidth:1,
         flexDirection: 'row',
         margin: 10,
     },

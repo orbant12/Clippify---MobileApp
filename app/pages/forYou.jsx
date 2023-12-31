@@ -125,12 +125,22 @@ return(
 <GestureHandlerRootView style={{ flex: 1 }}>
 <BottomSheetModalProvider>
 <View style={styles.container}>
-    <FlatList
+
+    {folders.length == 0 ? (
+        <View>
+        <View style={styles.boxContainer}>
+            <Text style={{fontWeight:600,color:"white"}}>
+                + Create new folder
+            </Text>
+        </View>
+        </View>) :
+    (
+        <FlatList
         data={folders}
         ListHeaderComponent={ 
             <Pressable onPress={handleBottomSheetOpen}>
         <View style={styles.boxContainer}>
-                <Text style={{fontWeight:600}}>
+                <Text style={{fontWeight:600,color:"white"}}>
                     + Create new folder
                 </Text>
         </View>
@@ -139,6 +149,8 @@ return(
         renderItem={({item}) => <FolderCard props={item} navigation={navigation} />}
         keyExtractor={(item) => item.id}
     />
+    )}
+    
 </View>
     <BottomSheetModal
         ref={bottomSheetRef}
@@ -192,7 +204,7 @@ return(
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#18191a',
         alignItems: 'center',
         paddingTop:100
     },
@@ -202,7 +214,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: 'black',
+        borderColor: 'white',
+        opacity:0.3,
         padding: 10,
         borderWidth: 1,
         flexDirection: 'row',

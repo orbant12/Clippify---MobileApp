@@ -6,7 +6,7 @@
 
 //BASIC IMPORTS
 import React, {useEffect, useState} from 'react';
-import { ScrollView,StyleSheet,Text,View,FlatList, Pressable } from 'react-native';
+import { ScrollView,StyleSheet,Text,View,FlatList, Pressable,Image } from 'react-native';
 
 //FIREBASE
 import { collection,getDocs,getDoc,doc } from "firebase/firestore";
@@ -14,7 +14,7 @@ import { db } from '../firebase';
 
 //COMPONENTS
 import FileCard from '../components/HomePage/fileCard';
-
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 //CONTEXT
 import { useAuth } from '../context/UserAuthContext';
 import FolderCard from '../components/HomePage/fodlerCard';
@@ -113,27 +113,77 @@ return (
 <View style={styles.container}>
   <ScrollView>
     <View style={styles.Frow}>
-        <Text style={styles.titleForYou}>Welcome Back, {}</Text>
-        <ScrollView style={{margin:40}} horizontal>
-          <Text>Valami</Text>
+      <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",paddingLeft:20}}>
+        <Text style={styles.titleForYou}>Welcome Back,  {userData?.fullname}</Text>
+          <Image
+            style={{width: 50, height: 50, borderRadius: 50,borderColor:"black",borderWidth:1,marginRight:30,zIndex:100}}
+            source={{
+              uri: userData?.profilePictureURL || "https://www.pngitem.com/pimgs/m/30-307416_profile-icon-png-image-free-download-searchpng-employee.png"
+            }}
+          />
+      </View>
+       
+        <ScrollView style={{marginTop:20,marginBottom:0}} horizontal>
+          <View style={styles.utilsContainer}>
+            <MaterialCommunityIcons
+              name="folder"
+              size={20}
+              color="white"
+              style={{opacity:0.8,padding:10,borderRadius:50,}}
+            />
+            <Text style={{color:"white",fontWeight:800,opacity:0.8}}>Storage</Text>
+            <View style={{padding:10,backgroundColor:"white",position:"absolute",top:0,right:0,borderBottomLeftRadius:50}} />
+          </View>
+
+          <View style={styles.utilsContainer}>
+            <MaterialCommunityIcons
+              name="folder"
+              size={20}
+              color="white"
+              style={{opacity:0.8,padding:10,borderRadius:50,}}
+            />
+            <Text style={{color:"white",fontWeight:800,opacity:0.8}}>Storage</Text>
+            <View style={{padding:10,backgroundColor:"white",position:"absolute",top:0,right:0,borderBottomLeftRadius:50}} />
+          </View>
+
+          <View style={styles.utilsContainer}>
+            <MaterialCommunityIcons
+              name="folder"
+              size={20}
+              color="white"
+              style={{opacity:0.8,padding:10,borderRadius:50,}}
+            />
+            <Text style={{color:"white",fontWeight:800,opacity:0.8}}>Storage</Text>
+            <View style={{padding:10,backgroundColor:"white",position:"absolute",top:0,right:0,borderBottomLeftRadius:50}} />
+          </View>
         </ScrollView>
     </View>
-    <View style={{height:1,opacity:0.1,width:"80%",borderWidth:1,borderColor:"black",marginRight:"auto",marginLeft:"auto",margin:40}}/>
-    <View>
+    <View style={{height:1,opacity:0.1,width:"80%",borderWidth:1,borderColor:"white",marginRight:"auto",marginLeft:"auto",margin:40}}/>
+    <View style={{padding:20}} >
       <Text style={[styles.titleForYou,{opacity:0.8,fontWeight:600}]}>Recently Added</Text>
-      <View>
+      <View >
+        {!recentFiles? (
+          <Text style={{color:"white",opacity:0.2,fontWeight:600,margin:10}}>No Files Added yet</Text>
+        ):(
           <FileCard navigation={navigation} props={recentFiles}/>
+        )}
       </View>
     </View>
-    <View style={{height:1,opacity:0.1,width:"80%",borderWidth:1,borderColor:"black",marginRight:"auto",marginLeft:"auto",margin:40}}/>
-    <View>
+    <View style={{height:1,opacity:0.1,width:"80%",borderWidth:1,borderColor:"white",marginRight:"auto",marginLeft:"auto",margin:40}}/>
+    <View style={{padding:20}}>
       <Text style={[styles.titleForYou,{opacity:0.8,fontWeight:600}]}>Your Memory</Text>
-      <FlatList
-        data={folders}
-        renderItem={({item}) => <FolderCard navigation={navigation} props={item} />}
-        showsVerticalScrollIndicator={false}
-        snapToInterval={300}
-      />
+      {folders.length == 0 ? (
+        <Text style={{color:"white",opacity:0.2,fontWeight:600,margin:10,marginBottom:100}}>No Folder Added yet</Text>
+      ):(
+      <>
+        <FlatList
+          data={folders}
+          renderItem={({item}) => <FolderCard navigation={navigation} props={item} />}
+          showsVerticalScrollIndicator={false}
+          snapToInterval={300}
+        />
+      </>
+      )}
     </View>
     </ScrollView>
 </View>
@@ -145,19 +195,30 @@ const styles = StyleSheet.create({
 
   container: {
       flex: 1,
-      backgroundColor: 'white',
+      backgroundColor: '#18191a',
       flexDirection: 'column',
       paddingTop:130
   },
   Frow: {
       flexDirection: 'column',
+      width: '100%',
 
   },
   titleForYou: {
       fontSize: 20,
       fontWeight: 'bold',
-      color: '#000000',
-      paddingLeft: 20,
-      paddingBottom: 20,
+      color: 'white',
+  },
+  utilsContainer: {
+      flexDirection: 'column',
+      alignItems: 'center',
+      width: 120,
+      height:150,
+      justifyContent: 'center',
+      borderBottomWidth: 1, 
+      borderWidth:1,
+      borderRadius:10,
+      backgroundColor: "black",
+      marginLeft:10
   },
 });
