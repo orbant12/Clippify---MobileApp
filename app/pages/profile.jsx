@@ -9,7 +9,6 @@ import { View,Text,StyleSheet,Image,TouchableOpacity } from "react-native"
 import React, { useEffect, useState } from 'react';
 
 //COMPONENTS
-import UserVideoPage from "../pages/Screens/profile/userVideoPage"
 import UserClipsPage from "../pages/Screens/profile/userClipsPage"
 import UserSavedPage from "../pages/Screens/profile/userSavedPage"
 
@@ -23,7 +22,7 @@ import { useAuth } from "../context/UserAuthContext";
 //FIREBASE
 import { doc,getDoc } from "firebase/firestore";
 import { db } from '../firebase';
-import AchivementPage from "./Screens/profile/userAchivementPage";
+import Inbox from "./inbox";
 
 
 const Profile = ({navigation,handleSettings}) => {
@@ -72,10 +71,6 @@ const Header = () => {
 return(
 <View style={styles.rowOne}>
     <Image 
-        source={{ uri: userData.thubnail }}
-        style={{ width:"100%",height: 350,position:"absolute",opacity:0.2}}
-    />
-    <Image 
         source={{ uri: userData.profilePictureURL }}
         style={{ 
             width: 80,
@@ -94,17 +89,17 @@ return(
     <View style={styles.userStatsRow}>
         <View style={styles.centeredCol}>
             <Text style={styles.numberHighlight}>{userData.followers}</Text>
-            <Text style={styles.titleNumberHighlight}>Followers</Text>
+            <Text style={styles.titleNumberHighlight}>Storage</Text>
         </View>
 
         <View style={styles.centeredCol}>
-            <Text style={styles.numberHighlight}>{userData.followers}</Text>
-            <Text style={styles.titleNumberHighlight}>Followers</Text>
+            <Text style={styles.numberHighlight}>{}</Text>
+            <Text style={styles.titleNumberHighlight}>Folders</Text>
         </View>
 
         <View style={styles.centeredCol}>
-            <Text style={styles.numberHighlight}>{userData.followers}</Text>
-            <Text style={styles.titleNumberHighlight}>Followers</Text>
+            <Text style={styles.numberHighlight}>{userData.subscription}</Text>
+            <Text style={styles.titleNumberHighlight}>Subscription</Text>
         </View>
     </View>
 
@@ -128,20 +123,11 @@ return (
         renderHeader={Header}
         style={{backgroundColor:"white"}}
     >
-        {/* VIDEO PAGE */}
-        <Tabs.Tab 
-            name="A"
-            label={() => <Entypo name={'camera'} size={25} color={"black"} />}
-        >
-            <Tabs.ScrollView>
-                <UserVideoPage navigation={navigation} />
-            </Tabs.ScrollView>
-        </Tabs.Tab>
 
         {/* CLIPS PAGE */}
         <Tabs.Tab 
             name="C"
-            label={() => <Entypo name={'video'} size={25} color={"black"} />}
+            label={() => <Entypo name={'folder'} size={25} color={"black"} />}
         >
             <Tabs.ScrollView>
                 <UserClipsPage navigation={navigation} />
@@ -151,7 +137,7 @@ return (
         {/* SAVED PAGE */}
         <Tabs.Tab 
             name="D"
-            label={() => <Entypo name={'save'} size={25} color={"black"} />}
+            label={() => <Entypo name={'book'} size={25} color={"black"} />}
         >
         
             <Tabs.ScrollView>
@@ -162,11 +148,11 @@ return (
         {/* COMMUNITY PAGE */}
         <Tabs.Tab 
             name="B"
-            label={() => <Entypo name={'trophy'} size={25} color={"black"} />}
+            label={() => <Entypo name={'bell'} size={25} color={"black"} />}
             activeColor={"red"}
         >
             <Tabs.ScrollView>
-                <AchivementPage />
+            <Inbox />
             </Tabs.ScrollView>
         </Tabs.Tab>
 

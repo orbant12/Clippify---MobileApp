@@ -164,13 +164,9 @@ const UserClipsPage = ({navigation}) => {
             </View>
             ):(
                 <View style={{flexDirection:"column",justifyContent:"space-evenly",width:"100%",borderTopWidth:1,borderBottomWidth:2,backgroundColor:"transparent",alignItems:"flex-end"}}>
-            <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"flex-start",width:"100%",padding:30,borderBlockColor:"black"}}>
-
-               
-                        <View style={{flexDirection:"column",justifyContent:"space-evenly",height:180}}>
-                     
+            <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"flex-start",width:"100%",padding:30,borderBlockColor:"black"}}>   
+                        <View style={{flexDirection:"column",justifyContent:"space-evenly",height:180}}>  
                         <TextInput onChangeText={handleTitleInputChange} placeholder='Folder Title' style={{borderBottomWidth:1,padding:8,borderRadius:10,width:200}} />
-
                         <View style={{height:100,}}>
                         <ColorPicker
                             color={color}
@@ -184,10 +180,8 @@ const UserClipsPage = ({navigation}) => {
                             swatches={false}
                          
                             />
-                        </View>
-                
-                        </View>
-                        
+                        </View>   
+                        </View>           
                         <View style={{right:0}}>
                         <Pressable onPress={() => setIsFolderEditing(false)}>
                             <MaterialCommunityIcons
@@ -198,13 +192,7 @@ const UserClipsPage = ({navigation}) => {
                             />
                             </Pressable>
                         </View>
-
-             
-             
             </View>
-
-           
-
             <View style={{marginRight:10,padding:20}}>
                 <Pressable onPress={() => handleCreateFolder()}>
                     <Text style={{fontWeight:"800"}}>Create</Text>
@@ -217,7 +205,7 @@ const UserClipsPage = ({navigation}) => {
             
             {folderList.map((folder) => (
                 <Pressable key={folder.id} onPress={ () => handleFolderOpen(folder.id,folder.title)}>
-                <UserClipsFolder folderTitlePass={folder.title} folderColorPass={folder.color} />
+                    <UserClipsFolder folderTitlePass={folder.title} folderColorPass={folder.color} />
                 </Pressable>
             )   
             )}

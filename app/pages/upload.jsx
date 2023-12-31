@@ -16,9 +16,9 @@ import {BottomSheetModal,BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import "react-native-gesture-handler"
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import UserClipsFolder from '../components/ProfilePage/userClipsFolder';
 //FIRESBASE
-import { doc, setDoc,getDoc } from "firebase/firestore";
+import { doc, setDoc,getDoc,collection,getDocs } from "firebase/firestore";
 import { db,storage } from "../firebase";
 import { ref,getDownloadURL, uploadBytes } from "firebase/storage";
 
@@ -60,11 +60,15 @@ const [shortURL,setShortURL] = useState("");
 //LOADING SCREEN | LOGIC
 const [loadingScreen, setLoadingScreen] = useState(false);
 
-//OWN UPLOAD SHOW | LOGIC
-const [ownUpload,setOwnUpload] = useState(false);
+//FOLDERS
+const [folders, setFolders] = useState([]);
 
 //BOTTOM SHEET 
 const bottomSheetRef = useRef(null);
+
+//BOTTOM SHEET FOLDER REF
+const bottomSheetFolderRef = useRef(null);
+
 
 //BOTTOM SHEET | SNAP POINTS
 const snapPoints = ['80%',"90%"]
@@ -80,6 +84,11 @@ const triggerCategorySheet = () => {
 const handlePickedCategory = (category) => {
   setSelectedCategory(category);
   bottomSheetRef.current?.close();
+}
+
+//BOTTOM SHEET | OPENER
+const handleFolderBottomSheetOpen = () => {
+  bottomSheetFolderRef.current?.present();
 }
 
 //IMAGE PICKER | UPLOAD
@@ -246,8 +255,31 @@ useEffect(() => {
   }
 };
 
+const fetchFolders = async () => {
+  if (!currentuser) {
+    setFolders([]);
+    return;
+  }
+  // USER ID & FIRESTORE REF
+  const currentUserId = currentuser.uid;
+  const colRef = collection(db, "users", currentUserId, "File-Storage");
+  // Fetch all documents (folders) in the subcollection
+  getDocs(colRef)
+    .then((querySnapshot) => {
+      const userFolders = [];
+      querySnapshot.forEach((doc) => {
+        userFolders.push({ id: doc.id, ...doc.data() });
+      });
+    setFolders(userFolders);
+    })
+    .catch((error) => {
+      console.error("Error fetching user folders: ", error);
+    });
+}
+
   //1.) Fetch the user data
   fetchUserData();
+  fetchFolders();
 },[currentuser])
 
 //PERMISSIONS ON LOAD
@@ -273,8 +305,8 @@ return (
       image: <Image source={{uri: "https://picsum.photos/200/300"}} />,
       title: 
         <View style={{flex:1,marginTop:15,alignItems:"center"}}>
-          <Text style={{fontWeight:"600",fontSize:18}}>Upload Your Video</Text>
-          <Text style={{marginTop:10}}>Must Be Longer then 30 minutes</Text>
+          <Text style={{fontWeight:"600",fontSize:18}}>Upload Your Clip</Text>
+          <Text style={{marginTop:10}}>Edit the length you'd like to upload</Text>
           {videoURL.length > 0 ? (
           <>
             <Video
@@ -302,9 +334,11 @@ return (
     {
       backgroundColor: 'white', 
       title: 
-        <View style={{flex:1,marginTop:15,alignItems:"center",width:"100%"}}>
+      <GestureHandlerRootView style={{ flex: 1,width:"100%" }}>
+      <BottomSheetModalProvider>
+        <View style={{flex:1,marginTop:15,alignItems:"center",width:"100%",flexDirection:"column"}}>
           <Text style={{fontWeight:"600",fontSize:18}}>Add Details</Text>
-          <Text style={{marginTop:10}}>This shows up first - Make it Catchy</Text>
+          <Text style={{marginTop:10}}>Make it your own</Text>
           <View style={{width:"100%",marginTop:50}}>
               <View style={{width:"80%",flexDirection:"column",justifyContent:"space-evenly",marginLeft:"auto",marginRight:"auto"}}>
                   <View style={{flexDirection:"row",width:"100%",justifyContent:"space-between"}}>
@@ -317,13 +351,33 @@ return (
           <View style={{width:"100%",marginTop:50}}>
             <View style={{width:"80%",flexDirection:"column",justifyContent:"space-evenly",marginLeft:"auto",marginRight:"auto"}}>
               <View style={{flexDirection:"row",width:"100%",justifyContent:"space-between"}}>
-                <Text style={{fontSize:16,fontWeight:"600",marginBottom:10}}>Description</Text>
-                <Text>{videoDescription.length}</Text>
+                <Text style={{fontSize:16,fontWeight:"600",marginBottom:10}}>Folder</Text>
               </View>
-              <TextInput scrollEnabled={true} multiline={true} numberOfLines={4} onChange={handleVideoDescription} style={{width:"100%",height:200,padding:10,borderBlockColo:"black",borderWidth:1, borderRadius:5}} placeholder="Type here..." />
+              <Pressable onPress={handleFolderBottomSheetOpen}><Text style={{padding:20,backgroundColor:"transparent",color:"black",textAlign:"center",borderRadius:30,borderWidth:2,borderColor:"black"}}>Select Folder</Text></Pressable>
             </View>
           </View>
-        </View>    
+        </View>
+        <BottomSheetModal
+          ref={bottomSheetFolderRef}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          handleIndicatorStyle={{backgroundColor:"white"}}
+          containerStyle={{width:"100%"}}
+          backgroundStyle={{backgroundColor:"black",borderTopLeftRadius:30,borderTopRightRadius:30}}
+        >
+          <ScrollView style={{width:"100%",backgroundColor:"white",borderWidth:2,borderColor:"black"}}>
+            {folders.map((folder) => (
+                  <Pressable key={folder.id}>
+                      <UserClipsFolder folderTitlePass={folder.title} folderColorPass={folder.color} />
+                  </Pressable>
+              )   
+              )}
+          </ScrollView>
+        </BottomSheetModal>
+       
+
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     },
     // 3.) ADD THUBNAIL
     {
@@ -334,24 +388,8 @@ return (
           <BottomSheetModalProvider>
             <View style={{flex:1,marginTop:15,alignItems:"center"}}>
               <Text style={{fontWeight:"600",fontSize:18}}>Additional Essentials</Text>
-              <Text style={{marginTop:10}}>Quality thubnails attracts new viewers !</Text>
-              {thubnailURL.length > 0 ? (
-              <>
-                <Image
-                  source={{ uri: thubnailURL }}
-                  style={{ width: "100%",aspectRatio:16/9,marginTop:50 }}
-                />
-                <TouchableOpacity onPress={() => pickImage("Images")} style={{marginTop:50,padding:10,backgroundColor:"orange",borderRadius:10}}>
-                  <Text style={{color:"white",fontWeight:"600"}}>Select New Thubnail</Text>
-                </TouchableOpacity>
-              </>
-              ) : (
-              <>
-                <TouchableOpacity onPress={() => pickImage("Images")} style={{marginTop:150,padding:10,backgroundColor:"black",borderRadius:10}}>
-                  <Text style={{color:"white",fontWeight:"600"}}>Select Thumbnail</Text>
-                </TouchableOpacity>
-              </>
-              )}
+              <Text style={{marginTop:10}}>Select category to be more organised...</Text>
+
               <View style={!thubnailURL.length > 0 ? {width:"100%",marginTop:50,alignItems:"center"} : {width:"100%",marginTop:-100,alignItems:"center"}} >
                 {selectedCategory !== "" ? (
                   <View style={{marginTop:150,alignItems:"center"}}>
@@ -466,73 +504,6 @@ return (
             </View>  
           </BottomSheetModalProvider>
         </GestureHandlerRootView>
-    },
-    // 4.) ADD SHORT
-    {
-      backgroundColor: '#fff',
-      image: <Image source={{uri: "https://picsum.photos/200/300"}} />,
-      title:
-        <View style={{flex:1,marginTop:15,alignItems:"center"}}>
-          <Text style={{fontWeight:"600",fontSize:18}}>Last Steps</Text>
-          <Text style={{marginTop:10,maxWidth:"80%",textAlign:"center"}}>You can hook your audience with shorts from the "for you page"</Text>
-          {/*SELECT TYPE*/}
-          <View style={{flexDirection:"row",width:"80%",marginLeft:"auto",marginRight:"auto",marginTop:40,justifyContent:"space-evenly"}}>
-            <TouchableOpacity onPress={() => setOwnUpload(true)}>
-              <Text style={ ownUpload? {fontWeight:"700",borderBottomWidth:2}:{}}>Own Upload</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setOwnUpload(false)}>
-              <Text style={ !ownUpload? {fontWeight:"700",borderBottomWidth:2}:{}}>Create with Ai </Text>
-            </TouchableOpacity>
-          </View>
-
-          {ownUpload ? (
-            shortURL.length > 0 ? (
-            <>
-              <TouchableOpacity onPress={() => pickShort()} style={{marginTop:40,padding:10,backgroundColor:"orange",borderRadius:10}}>
-                <Text style={{color:"white",fontWeight:"600"}}>Edit Short</Text>
-              </TouchableOpacity>
-              <Video
-                source={{ uri: shortURL }}
-                style={{ width: "50%",aspectRatio:9/16,marginTop:30 }}
-                useNativeControls={true}
-                shouldPlay={true}
-                isMuted={true}
-              />
-              <View style={{marginTop:100,alignItems:"center", opacity:0.4}}>
-                <Text>What a podcast !</Text>
-                <Text>We are proud to have you in the Lupody Team</Text>
-              </View>
-            </>
-            ) : (
-            <TouchableOpacity onPress={() => pickShort()} style={{marginTop:150,padding:10,backgroundColor:"black",borderRadius:10}}>
-              <Text style={{color:"white",fontWeight:"600"}}>Upload Short</Text>
-            </TouchableOpacity>
-            )
-          ):(
-          shortURL.length > 0 ? (
-          <>
-            <TouchableOpacity onPress={() => pickShort()} style={{marginTop:40,padding:10,backgroundColor:"orange",borderRadius:10}}>
-              <Text style={{color:"white",fontWeight:"600"}}>Regenerate</Text>
-            </TouchableOpacity>
-            <Video
-              source={{ uri: shortURL }}
-              style={{ width: "50%",aspectRatio:9/16,marginTop:30 }}
-              useNativeControls={true}
-              shouldPlay={true}
-              isMuted={true}
-            />
-            <View style={{marginTop:100,alignItems:"center", opacity:0.4}}>
-              <Text>What a podcast !</Text>
-              <Text>We are proud to have you in the Lupody Team</Text>
-            </View>
-          </>
-          ) : (
-            <TouchableOpacity onPress={() => pickShort()} style={{marginTop:150,padding:10,backgroundColor:"black",borderRadius:10}}>
-              <Text style={{color:"white",fontWeight:"600"}}>Generate Short !</Text>
-            </TouchableOpacity>
-          )
-          )}
-        </View>
     },
     ]}
   />

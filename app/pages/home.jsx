@@ -6,246 +6,158 @@
 
 //BASIC IMPORTS
 import React, {useEffect, useState} from 'react';
-import { ScrollView,StyleSheet,Text,View,FlatList } from 'react-native';
+import { ScrollView,StyleSheet,Text,View,FlatList, Pressable } from 'react-native';
 
 //FIREBASE
-import { collection,query,orderBy,limit,getDocs, startAfter, where } from "firebase/firestore";
+import { collection,getDocs,getDoc,doc } from "firebase/firestore";
 import { db } from '../firebase';
 
 //COMPONENTS
-import VideoFrame from '../components/HomePage/videoFrame';
-import VideoFrameScroll from '../components/HomePage/videoFrameScroll';
+import FileCard from '../components/HomePage/fileCard';
+
+//CONTEXT
+import { useAuth } from '../context/UserAuthContext';
+import FolderCard from '../components/HomePage/fodlerCard';
 
 export default function TabOneScreen({navigation}) {
 
 //<********************VARIABLES************************>
 
-//PODCAST POSTS
-const [posts, setPosts] = useState([]);
+//USER DATA
+const [userData, setUserData] = useState(null);
 
-//HEALTH PODCASTS
-const [healthPodcasts, setHealthPodcasts] = useState([]);
+//RECENT FILES
+const [recentFiles, setRecentFiles] = useState([]);
 
-//PODCAST POSTS | PAGINATION
-const [lastPost, setLastPost] = useState(null);
+//FOLDERS
+const [folders, setFolders] = useState([]);
 
+//FOLDER URL
+const [folderUrl, setFolderUrl] = useState("");
+
+//current user
+const { currentuser } = useAuth();
 
 //<********************FUNCTIONS************************>
 
-//LOAD MORE PODCASTS | PAGINATION
-const fetchMoreData = async () => {
-  const videoRef = collection(db, "videos");
-  const q = query(videoRef, orderBy("id", "desc"),startAfter(lastPost), limit(3));
-  const querySnapshot = await getDocs(q);
-  const tempPosts = [];
-  querySnapshot.forEach((doc) => {
-    tempPosts.push({
-      id: doc.id,
-      data: doc.data(),
-    });
-  });
-  setPosts([...posts, ...tempPosts]);
-}
-
-//FETCH PODCASTS
-const fetchUserRecommendedVideos = async () => {
-  const videoRef = collection(db, "videos");
-  const q = query(videoRef, orderBy("id", "desc"), limit(3));
-  const querySnapshot = await getDocs(q);
-  const tempPosts = [];
-  querySnapshot.forEach((doc) => {
-    tempPosts.push({
-      id: doc.id,
-      data: doc.data(),
-    });
-  });
-  setLastPost(tempPosts[tempPosts.length - 1].data.id);
-  setPosts(tempPosts);
-}
-
-//FETCH HEALTH PODCASTS
-const fetchHealthPodcasts = async () => {
-  const videoRef = collection(db, "videos");
-  const field = "video_category";
-  const q = query(videoRef, orderBy(field),where(field,"==","Health") , limit(3));
-  const querySnapshot = await getDocs(q);
-  const tempPosts = [];
-  querySnapshot.forEach((doc) => {
-    tempPosts.push({
-      id: doc.id,
-      data: doc.data(),
-    });
-  });
-  setHealthPodcasts(tempPosts);
-}
-
-//ON PAGE LOAD
+//UPDATES DEPENDING ON USER "FILE-Storage" DOCS
 useEffect(() => {
-  //1.) FETCH PODCASTS
-  fetchUserRecommendedVideos();
-  fetchHealthPodcasts();
-}, []);
+  if (!currentuser) {
+    setFolders([]);
+    return;
+  }
+  // USER ID & FIRESTORE REF
+  const currentUserId = currentuser.uid;
+  const colRef = collection(db, "users", currentUserId, "File-Storage");
+  // Fetch all documents (folders) in the subcollection
+  getDocs(colRef)
+    .then((querySnapshot) => {
+      const userFolders = [];
+      querySnapshot.forEach((doc) => {
+        userFolders.push({ id: doc.id, ...doc.data() });
+      });
+    setFolders(userFolders);
+    })
+    .catch((error) => {
+      console.error("Error fetching user folders: ", error);
+    });
+    //FETCH USER DATA
+    const fetchData = async () => {
+      try {
+        if (currentuser) {
+          const currentUserId = currentuser.uid;
+          const userDocRef = doc(db, "users", currentUserId);
+          const docSnapshot = await getDoc(userDocRef);
+          if (docSnapshot.exists()) {
+            // Document exists, retrieve its data
+            const elementData = docSnapshot.data();
+            setUserData(elementData);
+          } else {
+            console.log("Document does not exist.");
+            setUserData(null); // Set to null or handle accordingly
+          }
+        }
+      } catch (error) {
+        console.error("Error getting document: ", error);
+      }
+    };
+    // Call fetchData
+    fetchData();
+}, [currentuser]);
+
+//RECENTLY ADDED
+useEffect(() => {
+  const fetchRecent = async () => {
+    try{
+      if (userData !== null) {
+        const fileChildrenRef = userData.recent;
+        const docSnapshot = await getDoc(fileChildrenRef)
+        if (docSnapshot.exists()) {
+          // Document exists, retrieve its data
+          const elementData = docSnapshot.data();
+          setRecentFiles(elementData);
+        } else {
+          console.log("Document does not exist.");
+          setRecentFiles([]); // Set to null or handle accordingly
+        }
+      }
+    } catch(err) {
+      console.log(err)
+    }
+  }
+  fetchRecent();
+}, [userData]);
 
 
 return (
 <View style={styles.container}>
-  <FlatList 
-    style={{width:"100%",marginTop:90}}
-    keyExtractor={(item) => item.id} 
-    data={posts}
-    ItemSeparatorComponent={() =>
-      <View style={styles.container}>
-        <View style={styles.header} >
-          <Text style={styles.title}>Best "Health" Podcasts</Text>
-          <Text style={styles.moreLink} onPress={() => navigation.navigate("SelectedCategoryPage",{category:"Health"})} >View More</Text>
-        </View>
-      <ScrollView style={styles.scrollContainer} horizontal={true} >
-        <View style={styles.contentContainer}>
-          {healthPodcasts.map((podcast) => (
-            <VideoFrame navigation={navigation} props={podcast.data} />
-          ))} 
-        </View>
-      </ScrollView>
-      </View>
-    }
-    onEndReached={fetchMoreData}
-    renderItem={({item}) => (
-      <VideoFrameScroll navigation={navigation} props={item.data}  />
-    )}
-  />
-  <View style={styles.container}>
-
-    <View style={styles.header} >
-      <Text style={styles.title}>Best "Health" Podcasts</Text>
-      <Text style={styles.moreLink}>View More</Text>
+  <ScrollView>
+    <View style={styles.Frow}>
+        <Text style={styles.titleForYou}>Welcome Back, {}</Text>
+        <ScrollView style={{margin:40}} horizontal>
+          <Text>Valami</Text>
+        </ScrollView>
     </View>
-    <ScrollView style={styles.scrollContainer} horizontal={true} >
-      <View style={styles.contentContainer}>
-
+    <View style={{height:1,opacity:0.1,width:"80%",borderWidth:1,borderColor:"black",marginRight:"auto",marginLeft:"auto",margin:40}}/>
+    <View>
+      <Text style={[styles.titleForYou,{opacity:0.8,fontWeight:600}]}>Recently Added</Text>
+      <View>
+          <FileCard navigation={navigation} props={recentFiles}/>
       </View>
-    </ScrollView>
-  </View>
-  <View style={styles.container}>
-    <View style={styles.header} >
-      <Text style={styles.title}>Best "Business" Podcasts</Text>
-      <Text style={styles.moreLink}>View More</Text>
     </View>
-    <ScrollView style={styles.scrollContainer} horizontal={true} >
-      <View style={styles.contentContainer}>
- 
-      </View>
+    <View style={{height:1,opacity:0.1,width:"80%",borderWidth:1,borderColor:"black",marginRight:"auto",marginLeft:"auto",margin:40}}/>
+    <View>
+      <Text style={[styles.titleForYou,{opacity:0.8,fontWeight:600}]}>Your Memory</Text>
+      <FlatList
+        data={folders}
+        renderItem={({item}) => <FolderCard navigation={navigation} props={item} />}
+        showsVerticalScrollIndicator={false}
+        snapToInterval={300}
+      />
+    </View>
     </ScrollView>
-  </View>
 </View>
+
 );
 }
 
 const styles = StyleSheet.create({
 
-  select:{
-  flex: 1,
-  flexDirection: 'row',
-  justifyContent:"space-evenly" ,
-  alignItems: 'center',
-  marginLeft:"auto",
-  marginRight:"auto",
-    height: 50,
-    width: '80%',
-    backgroundColor:'none',
-    marginTop:40,
-  },
-  backgroundVideo: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-  },
   container: {
-    flex: 1,
-    alignItems: 'center',
-    width: '100%',
+      flex: 1,
+      backgroundColor: 'white',
+      flexDirection: 'column',
+      paddingTop:130
+  },
+  Frow: {
+      flexDirection: 'column',
 
   },
-  title: {
-    fontSize: 15,
-    fontWeight: 'bold',
+  titleForYou: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: '#000000',
+      paddingLeft: 20,
+      paddingBottom: 20,
   },
-  moreLink: {
-    fontSize: 10,
-    opacity: 0.5,
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-  header:{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    padding: 20,
-  },
-  horizontalLine: {
-    borderColor:"black",
-    borderWidth: 1,
-    opacity: 0.5,
-    width: 1,
-    height:20,
-   // Adjust the width of the line
-    marginVertical: 10, // Adjust the spacing above and below the line
-  },
-  selected: {
-    opacity: 1,
-    fontWeight: 'bold',
-  },
-  contentContainer: {
-    flexDirection: 'row', // Arrange the content horizontally 
-  },
-  scrollContainer: {
-    flexDirection: 'row',
-  },
-    postContainer:{
-        width:"100%",
-        height:"100%",
-        backgroundColor:"white",
-        alignItems:"center",
-        justifyContent:"center"
-    },
-    videoContainer:{
-        width:"100%",
-        height:"100%",
-        backgroundColor:"black",
-        alignItems:"center",
-        justifyContent:"center",
-        zIndex: 1
-    },
-    videoFY: {
-        width: '100%',
-        height: '100%',
-        zIndex: 1,
-      },
-      titleForYou: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 8,
-      },
-      description: {
-        fontSize: 16,
-        marginBottom: 16,
-      },
-      userInfoContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-      },
-      likes: {
-        fontSize: 16,
-        marginRight: 8,
-      },
-      avatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-      },
 });

@@ -73,19 +73,6 @@ useEffect(() => {
 
 return (
 <View style={styles.container}>
-    <View style={styles.titleRowOne}>
-        <Text style={styles.title}>Followed Casts</Text>
-    </View>
-            
-    <View style={styles.castsContainer}>
-        <ScrollView horizontal style={{width:"100%",flexDirection:"row"}}>
-        {followedCasts.map((item) => (
-            <InboxFollowedProfile navigation={navigation} props={item.data}  />
-        ))}
-            
-        </ScrollView>
-    </View>
-
     <ScrollView>
         <View style={styles.featuresTitleRow}>
             <Text style={styles.title}>Your Mail</Text>

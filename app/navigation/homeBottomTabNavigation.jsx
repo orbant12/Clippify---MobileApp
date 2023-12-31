@@ -60,19 +60,12 @@ return (
           headerTransparent: true,
           header : () => (
           <>
-            <View style={{position:"absolute",marginLeft:0,left:0,marginTop:45}}>
-              <Image
-                style={{ width: 100, height: 50}}
-                source={require('../../assets/images/lupo.png')}
-              />
-            </View>
-
             <View style={{marginTop:60,marginLeft:95,marginRight:"auto",flexDirection:"row",justifyContent:"space-evenly",alignItems:"center",width:"50%",zIndex:5}}>
               <TouchableOpacity onPress={() => setIsExplore(true)} style={isExplore? {borderBottomColor:"black",borderBottomWidth:2} : {}}>
-                <Text style={isExplore?{fontWeight:"800"}:{opacity:0.4,fontWeight:800,color:"black"}}>Explore</Text>
+                <Text style={isExplore?{fontWeight:"800"}:{opacity:0.4,fontWeight:800,color:"black"}}>Home</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setIsExplore(false)} style={!isExplore? {borderBottomColor:"black",borderBottomWidth:2} : {}}>
-                <Text style={isExplore?{opacity:0.4,fontWeight:800,color:"black"}:{fontWeight:"800"}}>For You</Text>
+                <Text style={isExplore?{opacity:0.4,fontWeight:800,color:"black"}:{fontWeight:"800"}}>Folders</Text>
               </TouchableOpacity>
               <View style={{position:"absolute",marginLeft:200,marginRight:0}}>
                 <Icon
@@ -92,30 +85,6 @@ return (
         }}
       />
 
-      {/* SEARCH NAVIGATION */}
-      <Tab.Screen
-        name={'Search'}
-        component={TabTwoScreen}
-        options={{
-          header: () => (
-            <View style={{flexDirection:"row",justifyContent:"space-between",marginRight:30,marginLeft:30,alignItems:"center",marginTop:40}}>
-              <Image
-                style={{width: 100, height: 50}}
-                source={require('../../assets/images/lupo.png')}
-              />
-              <Icon
-                name='notifications'
-                type='material'
-                color='black'
-                size={25}
-              />
-            </View>
-          ),
-          tabBarIcon: ({color}) => (
-            <AntDesign name={'search1'} size={25} color={color} />
-          ),
-        }}
-      />
       {/* UPLOAD NAVIGATION */}
       <Tab.Screen
         name={'Upload'}
@@ -136,28 +105,10 @@ return (
               />
             </View>
           ),
-          tabBarIcon: ({}) => (
-            <Image
-              source={plusIcon}
-              style={{height: 35, resizeMode: 'contain'}}
-            />
+          tabBarIcon: ({color}) => (
+            <Entypo name={'plus'} size={25} color={color} />
           ),
           tabBarLabel: () => null,
-        }}
-      />
-      {/* INBOX NAVIGATION */}
-      <Tab.Screen
-        name={'Inbox'}
-        component={Inbox}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({color}) => (
-            <MaterialCommunityIcons
-              name={'message-minus-outline'}
-              size={25}
-              color={color}
-            />
-          ),
         }}
       />
       {/* PROFILE NAVIGATION */}

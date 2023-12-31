@@ -312,7 +312,7 @@ return(
                         </View>
                         {/* Sheet Content | RELATED FILES */}
                         {relatedFileList.map((file) => (
-                            <FileContainer navigation={navigation} item={file} />
+                            <FileContainer  item={file} />
                         ))}
                     </>
                 ):(
@@ -334,7 +334,7 @@ return(
                 {/* Ai First Question | Title */}
                 <View style={{alignItems:"center",marginTop:10, borderBottomWidth:2,paddingBottom:8,width:"60%",marginLeft:"auto",marginRight:"auto"}}>
                     <Text style ={{fontWeight:600,fontSize:20}}>
-                        Welcome To Lupody Ai
+                        Welcome To Clippify Ai
                     </Text>
                 </View>
                 {/* Ai First Question | Content */}
